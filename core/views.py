@@ -13,7 +13,7 @@ from .models import Event, Venue
 
 def search(request):
 
-    initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '45'}
+    initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30'}
 
     search_form = SearchForm(request.GET or initial_data)
 

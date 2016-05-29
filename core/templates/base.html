@@ -1,4 +1,5 @@
 {% load event_dates %}
+{% load static %}
 
 <!doctype html>
 <html>
@@ -13,6 +14,7 @@
         [contenteditable]{ cursor: pointer; padding: 1px 3px; border-bottom: 2px #0099ff dashed; }
         [contenteditable]:focus{ cursor: text; }
         .invalid{ border-bottom-color: #ff9900 }
+        .logo a:hover{ text-decoration: none; }
         footer{ margin: 5em 0 2em; padding: 2em 0; }
     </style>
 </head>
@@ -21,59 +23,27 @@
 <section>
     <div class="container">
         <header>
-            <h3>ProgressiveEvents.org <span class="small">(v0.1 / super alpha)</span></h3>
+            <h3 class="logo"><a href="{% url "index" %}"><img src="{% static "img/pe-logo.png" %}" /> Progressive Events</a></h3>
         </header>
     </div>
 </section>
 
-<section>
-    <div class="row">
-        <div class="col-xs-12">
-            <div id="map">
-            </div>
-        </div>
-    </div>
-</section>
+{% block content %}
 
 <section>
+
     <div class="container">
 
-        <div class="events">
-            
-            {% include "search-form.html" %}
+        {% block wrapped %}
 
-            {% for event in events %}
-                <div class="event-item row">
-                    <div class="col-sm-8">
-                        <h4>{{ event.title }}</h4>
-                        
-                        {% if event.venue.address %}
-                            <p>at <b>{{ event.venue.title }}</b> <span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></p>
-                        {% endif %}
-                        
-                        {% if event.host %}<p class="small">Hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</p>{% endif %}
-                    </div>
+        {% endblock %}
 
-                    <div class="col-sm-4">
-                        <h5>Upcoming Dates:</h5>
-                        <ul>
-                            {% event_dates event days=search_form.days.value as dates %}
-                            {% for date in dates %}
-                                <li>{{ date|date:"F jS, Y" }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="event-item text-center" style="padding: 4em 0">
-                    <h4>No events matching that search!</h4>
-                    <p><a href="mailto:jon.c.culver@gmail.com">Get in touch</a>
-                        if you want to help us populate the map in your area!</p>
-                </div>
-            {% endfor %}
-        </div>
     </div>
+
 </section>
+
+
+{% endblock %}
 
 <section>
     <div class="container">

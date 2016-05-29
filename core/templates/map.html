@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    {% load event_dates %}
+
+    <section>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="map">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+
+            <div class="events">
+                
+                {% include "search-form.html" %}
+
+                {% for event in events %}
+                    <div class="event-item row">
+                        <div class="col-sm-8">
+                            <h4>{{ event.title }}</h4>
+                            
+                            {% if event.venue.address %}
+                                <p>at <b>{{ event.venue.title }}</b> <span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></p>
+                            {% endif %}
+                            
+                            {% if event.host %}<p class="small">Hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</p>{% endif %}
+                        </div>
+
+                        <div class="col-sm-4">
+                            <h5>Upcoming Dates:</h5>
+                            <ul>
+                                {% event_dates event days=search_form.days.value as dates %}
+                                {% for date in dates %}
+                                    <li>{{ date|date:"F jS, Y" }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="event-item text-center" style="padding: 4em 0">
+                        <h4>No events matching that search!</h4>
+                        <p><a href="mailto:jon.c.culver@gmail.com">Get in touch</a>
+                            if you want to help us populate the map in your area!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

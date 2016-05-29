@@ -1,3 +1,5 @@
+{% load event_dates %}
+
 <!doctype html>
 <html>
 <head>
@@ -54,7 +56,8 @@
                     <div class="col-sm-4">
                         <h5>Upcoming Dates:</h5>
                         <ul>
-                            {% for date in event.dates %}
+                            {% event_dates event days=search_form.days.value as dates %}
+                            {% for date in dates %}
                                 <li>{{ date|date:"F jS, Y" }}</li>
                             {% endfor %}
                         </ul>

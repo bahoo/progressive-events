@@ -50,7 +50,7 @@ class Organization(models.Model):
 
 class EventQueryset(models.query.GeoQuerySet):
 
-    def filter_by_date(self, as_occurrences=False, assign_occurrences=True, **kwargs):
+    def filter_by_date(self, as_occurrences=False, **kwargs):
         future_date = datetime.now() + timedelta(**kwargs)
         queryset = self.all()
         events = filter(lambda e: len(e.recurrences.between(datetime.now(), future_date)) > 0, queryset)
@@ -60,10 +60,7 @@ class EventQueryset(models.query.GeoQuerySet):
                 occurrences += e.recurrences.between(datetime.now(), future_date)
             return occurrences
         else:
-            if assign_occurrences:
-                for e in events:
-                    e.dates = e.recurrences.between(datetime.now(), future_date)
-            return events
+            return self.filter(pk__in=map(lambda e: e.pk, events))
 
 
 class Event(models.Model):
@@ -85,3 +82,9 @@ class Event(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def dates(self, *args, **kwargs):
+        if not kwargs:
+            kwargs = {'days': 45}
+        future_date = datetime.now() + timedelta(**kwargs)
+        return self.recurrences.between(datetime.now(), future_date)

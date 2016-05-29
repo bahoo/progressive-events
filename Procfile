@@ -1,0 +1,1 @@
+web: gunicorn demevents.wsgi --log-file - --timeout 360

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <title>Progressive Events</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <style>
+        #map{ width: 100%; height: 400px; }
+    </style>
+</head>
+<body>
+
+<div id="map">
+</div>
+
+
+<ul>
+    {% for event in events %}
+        <li>
+            <b>{{ event.title }}</b>
+            {% if event.host %}<em>Hosted by {{ event.host.title }}</em>{% endif %}
+            {% if event.venue.address %}
+                {{ event.venue.address }}<br />
+                {{ event.venue.city }}, {{ event.venue.state }} {{ event.venue.zipcode }}
+            {% endif %}
+
+            {% for date in event.dates %}
+                {{ date }}
+            {% endfor %}
+
+            </li>
+    {% endfor %}
+</ul>
+
+<script>
+    var map = L.map('map').setView([47, -122], 13);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    {% for event in events %}
+
+        L.marker([{{ event.venue.point.y }}, {{ event.venue.point.x }}]).addTo(map)
+            .bindPopup('{{ event.title }}');
+
+    {% endfor %}
+</script>
+
+
+</body>
+</html>

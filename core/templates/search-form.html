@@ -1,0 +1,9 @@
+{% load bootstrap3 %}
+
+<form action="" method="get" class="search-form form-inline">
+    <h4>Events within <span data-attribute="distance" contenteditable="true">{{ search_form.distance.value }}</span> {{ search_form.distance }} miles
+        of <span data-attribute="address" contenteditable="true">{{ search_form.address.value }}</span> {{ search_form.address }}
+        in the next <span data-attribute="days" contenteditable="true">{{ search_form.days.value }}</span> {{ search_form.days }} days
+        <button type="submit" class="btn btn-primary">Go &rsaquo;</button>
+    </h4>
+</form>

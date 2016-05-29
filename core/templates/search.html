@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+    <title>Progressive Events</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <style>
+        #map{ width: 100%; min-height: 30em; }
+        .event-item{ padding: 1em 0; border-bottom: 1px #ccc solid; }
+        [contenteditable]{ padding: 1px 3px; border-bottom: 2px #0099ff dashed; }
+        .invalid{ border-bottom-color: #ff9900 }
+    </style>
+</head>
+<body>
+
+<section>
+    <div class="container">
+        <header>
+            <h3>ProgressiveEvents.org <span class="small">(v0.1 super super alpha :D)</span></h3>
+        </header>
+    </div>
+</section>
+
+<section>
+    <div class="row">
+        <div id="map">
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+
+        <div class="events">
+            
+            {% include "search-form.html" %}
+
+            {% for event in events %}
+                <div class="event-item row">
+                    <div class="col-sm-8">
+                        <h4>{{ event.title }}</h4>
+                        
+                        {% if event.venue.address %}
+                            <p>at <b>{{ event.venue.title }}</b> <span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></p>
+                        {% endif %}
+                        
+                        {% if event.host %}<p class="small">Hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</p>{% endif %}
+                    </div>
+
+                    <div class="col-sm-4">
+                        <h5>Upcoming Dates:</h5>
+                        <ul>
+                            {% for date in event.dates %}
+                                <li>{{ date|date:"F jS, Y" }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<script>
+    document.querySelector('.search-form').addEventListener('keyup', function(e){
+
+        // update data
+        var field = e.target.closest('form').querySelector('[name="' + e.target.getAttribute('data-attribute') + '"]');
+        field.value = e.target.innerHTML;
+
+
+        if(field.value == e.target.innerHTML && field.checkValidity()){
+            e.target.classList.remove('invalid');
+
+            if(e.which == 13){
+                e.target.closest('form').submit();
+            }
+
+        } else {
+            e.target.classList.add('invalid');
+        }
+
+    });
+
+    document.querySelector('.search-form').addEventListener('keypress', function(e){
+
+        // no enter key.
+        if(e.which == 13){
+            e.preventDefault();
+        }
+
+    });
+</script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script>
+    var map = L.map('map', {
+        scrollWheelZoom: false
+    }).setView([47, -122], 13);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var points = [];
+
+    {% for event in events %}
+
+        points.push(L.marker([{{ event.venue.point.y }}, {{ event.venue.point.x }}]).bindPopup('{{ event.title }}'));
+
+    {% endfor %}
+
+    var markerGroup = L.featureGroup(points);
+    markerGroup.addTo(map);
+    console.log(markerGroup);
+    map.fitBounds(markerGroup.getBounds());
+</script>
+
+
+</body>
+</html>

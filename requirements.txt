@@ -4,6 +4,7 @@ decorator==4.0.9
 dj-database-url==0.4.1
 Django==1.9.6
 django-annoying==0.9.0
+django-bootstrap3==7.0.1
 django-dotenv==1.4.1
 django-eventtools==0.9.7
 django-localflavor==1.3

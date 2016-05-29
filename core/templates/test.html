@@ -24,9 +24,11 @@
                 {{ event.venue.city }}, {{ event.venue.state }} {{ event.venue.zipcode }}
             {% endif %}
 
-            {% for date in event.dates %}
-                {{ date }}
-            {% endfor %}
+            <ul>
+                {% for date in event.dates %}
+                    <li>{{ date|date:"F jS, Y" }} at {{ event.start }} &ndash; {{ event.end }}</li>
+                {% endfor %}
+            </ul>
 
             </li>
     {% endfor %}
@@ -50,7 +52,7 @@
     var markerGroup = L.featureGroup(points);
     markerGroup.addTo(map);
     console.log(markerGroup);
-    map.fitBounds(markerGroup.getBounds().pad(3));
+    map.fitBounds(markerGroup.getBounds().pad(2));
 </script>
 
 

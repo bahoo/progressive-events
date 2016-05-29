@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', ''.join([random.SystemRandom().choice(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['progressiveevents.org', 'www.progressiveevents.org', 'localhost', 'progressiveevents.herokuapp.com']
 
 
 # Application definition

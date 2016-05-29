@@ -22,11 +22,12 @@ def search(request):
 
     geolocator = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
     location = geolocator.geocode(address)[0]['geometry']['location']
-    pnt = GEOSGeometry('POINT(%(lng)s %(lat)s)' % {'lng': location['lng'], 'lat': location['lat']}, srid=4326)
+    point = GEOSGeometry('POINT(%(lng)s %(lat)s)' % {'lng': location['lng'], 'lat': location['lat']}, srid=4326)
 
-    events = Event.objects.filter(venue__point__distance_lte=(pnt, D(mi=distance))).select_related('venue', 'host').filter_by_date(days=days)
+    events = Event.objects.filter(venue__point__distance_lte=(point, D(mi=distance))).select_related('venue', 'host').filter_by_date(days=days)
     return render(request, 'search.html',
                                             {'events': events,
                                             'now': datetime.now(),
                                             'future': datetime.now() + timedelta(days=days),
-                                            'search_form': search_form })
+                                            'search_form': search_form,
+                                            'point': point })

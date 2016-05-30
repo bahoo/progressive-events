@@ -33,9 +33,12 @@
                                 <p><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><span class="glyphicon glyphicon-map-marker"style="margin-right: 0.33em;"></span><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a></p>
                             {% endif %}
                             
-
                             {% if event.description %}
                                 <p style="margin: 0 1em 10px">{{ event.description | safe }}</p>
+                            {% endif %}
+
+                            {% if event.url %}
+                                <p><span class="glyphicon glyphicon-link"></span> More info: <a href="{{ event.url }}" target="_blank">{{ event.url }}</a></p>
                             {% endif %}
                         </div>
 

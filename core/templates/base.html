@@ -103,8 +103,7 @@
 
     var markerGroup = L.featureGroup(points);
     markerGroup.addTo(map);
-    console.log(markerGroup);
-    map.fitBounds(markerGroup.getBounds());
+    map.fitBounds(markerGroup.getBounds().pad(0.02));
 </script>
 
 

@@ -1,16 +1,13 @@
-import googlemaps
-
 from datetime import datetime, timedelta
-from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
-from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from .forms import SearchForm
 from .models import Event, Venue
+from .utils import get_point
 
 
 class MapView(TemplateView):
@@ -25,9 +22,7 @@ class MapView(TemplateView):
         distance = int(search_form.data.get('distance', initial_data.get('distance')))
         days = int(search_form.data.get('days', initial_data.get('days')))
 
-        geolocator = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
-        location = geolocator.geocode(address)[0]['geometry']['location']
-        point = GEOSGeometry('POINT(%(lng)s %(lat)s)' % {'lng': location['lng'], 'lat': location['lat']}, srid=4326)
+        point = get_point(address)
 
         type_filter = Q()
         event_types = self.request.GET.getlist('event_types', initial_data.get('event_types', []))

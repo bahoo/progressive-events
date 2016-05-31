@@ -11,9 +11,14 @@
     <style>
         #map{ width: 100%; min-height: 30em; }
         .event-item{ padding: 1em 0; border-bottom: 1px #ccc solid; }
-        [contenteditable]{ cursor: pointer; padding: 1px 3px; border-bottom: 2px #0099ff dashed; }
-        [contenteditable]:focus{ cursor: text; }
-        .invalid{ border-bottom-color: #ff9900 }
+        [contenteditable]{ cursor: pointer; padding: 1px 5px; border-color: #99ccff; border-width: 1px; border-style: solid; border-radius: 4px; }
+        [contenteditable]:focus{ cursor: text; outline: none; background: #cceeff; border-color: #0099ff; }
+        [contenteditable].invalid{ border-color: #ff9900; background: #ffeecc; }
+
+        .search-form{ max-width: 80%; margin-left: auto; margin-right: auto; }
+        .search-form .event-type-list{ transition: left 0.2s ease-out, top 0.2s ease-out; background: #fff; border-radius: 10px; padding: 0.5em; box-shadow: 0 2px 8px #888; z-index: 1; text-align: left; }
+        .search-form .event-type-list label{ text-transform: lowercase; font-weight: normal; font-size: 0.8em; cursor: pointer; }
+
         .logo a:hover{ text-decoration: none; }
         footer{ margin: 5em 0 2em; padding: 2em 0; }
     </style>
@@ -53,36 +58,7 @@
         </footer>
 
 
-<script>
-    document.querySelector('.search-form').addEventListener('keyup', function(e){
-
-        // update data
-        var field = e.target.closest('form').querySelector('[name="' + e.target.getAttribute('data-attribute') + '"]');
-        field.value = e.target.innerHTML;
-
-
-        if(field.value == e.target.innerHTML && field.checkValidity()){
-            e.target.classList.remove('invalid');
-
-            if(e.which == 13){
-                e.target.closest('form').submit();
-            }
-
-        } else {
-            e.target.classList.add('invalid');
-        }
-
-    });
-
-    document.querySelector('.search-form').addEventListener('keypress', function(e){
-
-        // no enter key.
-        if(e.which == 13){
-            e.preventDefault();
-        }
-
-    });
-</script>
+<script src="{% static "js/progressive-events.js" %}"></script>script>
 <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 <script>
     var map = L.map('map', {

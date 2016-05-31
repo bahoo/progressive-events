@@ -45,7 +45,7 @@
                         <div class="col-sm-5">
                             {% event_dates event days=search_form.days.value as dates %}
                             <h5 class="text-muted"><span class="glyphicon glyphicon-calendar"></span>
-                                {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Date{% endif %}:</h5>
+                                {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
                             <p>
                                 {% for date in dates|slice:"0:3" %}
                                     {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}

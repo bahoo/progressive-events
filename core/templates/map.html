@@ -33,7 +33,7 @@
                             </h4>
                             
                             {% if event.description %}
-                                <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | safe }}</p>
+                                <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | linebreaksbr | urlize }}</p>
                             {% endif %}
                             
                             {% if event.venue.address %}
@@ -126,7 +126,7 @@
                                 </p>
                             {% endif %}
                             {% if event.description %}
-                                <p>{{ event.description | safe }}</p>
+                                <p>{{ event.description | linebreaksbr | safe }}</p>
                             {% endif %}
                             <p>
                                 {% if event.url %}

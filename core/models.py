@@ -36,7 +36,7 @@ class Venue(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         if self.address and not self.point:
-            self.point = Point(**get_point(' '.join([self.address, self.city, self.state, self.zipcode])))
+            self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
         return super(Venue, self).save(*args, **kwargs)
 
     def __unicode__(self):

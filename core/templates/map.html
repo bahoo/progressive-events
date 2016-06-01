@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block navbar %}
-    <div class="col-sm-6 text-right">
+    <div class="col-sm-6 text-right hidden-xs">
         <a href="{% url "add" %}" class="btn btn-primary" style="margin-top: 1.25em;"><span class="glyphicon glyphicon-plus-sign"></span> Add Event</a>
     </div>
 {% endblock %}
@@ -14,12 +14,7 @@
     {% load event_dates %}
 
     <section>
-        <div class="row">
-            <div class="col-xs-12">
-                <div id="map">
-                </div>
-            </div>
-        </div>
+        <div id="map""></div>
     </section>
 
     <section>
@@ -47,40 +42,59 @@
                             
 
                             {% if event.url %}
-                                <p><span class="glyphicon glyphicon-link text-muted"></span> More info: <a href="{{ event.url }}" target="_blank">{{ event.url }}</a></p>
+                                <p><span class="glyphicon glyphicon-link text-muted"></span> More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a></p>
                             {% endif %}
                         </div>
 
-                        <div class="col-sm-5">
+                        <div class="col-sm-5 event-sidebar">
                             {% event_dates event days=search_form.days.value as dates %}
-                            <h5 class="text-muted"><span class="glyphicon glyphicon-calendar"></span>
-                                {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
-                            <p>
-                                {% for date in dates|slice:"0:3" %}
-                                    {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                            </p>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-calendar"></span>
+                                        {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
+                                    <p>
+                                        {% for date in dates|slice:"0:3" %}
+                                            {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                </div>
+                            </div>
                             {% if event.start %}
-                                <h5 class="text-muted"><span class="glyphicon glyphicon-time"></span> Time:</h5>
-                                <p>{{ event.start }} {% if event.end %}&ndash; {{ event.end }}{% endif %}</p>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-time"></span> Time:</h5>
+                                        <p>{{ event.start }} {% if event.end %}&ndash; {{ event.end }}{% endif %}</p>
+                                    </div>
+                                </div>
                             {% endif %}
                             {% if event.recurrences.rrules %}
-                                <h5 class="text-muted"><span class="glyphicon glyphicon-repeat"></span> Schedule:</h5>
-                                <ul class="list-unstyled">
-                                    {% for rule in event.recurrences.rrules %}
-                                        <li>{{ rule.to_text | title }}</li>
-                                    {% endfor %}
-                                </ul>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-repeat"></span> Schedule:</h5>
+                                        <ul class="list-unstyled">
+                                            {% for rule in event.recurrences.rrules %}
+                                                <li>{{ rule.to_text | title }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                 {% empty %}
                     <div class="event-item text-center" style="padding: 4em 0">
-                        <h4>No events matching that search!</h4>
-                        <p><a href="mailto:jon.c.culver@gmail.com">Get in touch</a>
-                            if you want to help us populate the map in your area!</p>
+                        <h4>No events matching that search.</h4>
                     </div>
                 {% endfor %}
+            </div>
+
+
+            <div class="text-center" style="max-width: 85%; margin-top: 4em; margin-left: auto; margin-right: auto;">
+                <p class="lead">Not finding what you're looking for?</p>
+                <p>Progressive Events is powered by volunteers like you, to surface
+                    events and opportunities for getting involved in your community.</p>
+                <p>We're just getting started, so if you know of an event that should be up here, please consider adding it:</p>
+                    <a href="{% url "add" %}" class="btn btn-primary" style="margin-top: 1em;"><span class="glyphicon glyphicon-plus-sign"></span> Add Event</a>
             </div>
         </div>
     </section>
@@ -116,7 +130,7 @@
                             {% endif %}
                             <p>
                                 {% if event.url %}
-                                    <a href="{{ event.url }}" target="_blank"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>{{ event.url }}</a><br />
+                                    <a href="{{ event.url }}" target="_blank" class="link"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>{{ event.url }}</a><br />
                                 {% endif %}
                                 <a href="#{{ event.title | slugify }}-{{ event.pk }}"><span class="glyphicon glyphicon-info-sign" style="margin-right: 0.33em"></span>Jump to listing</a>
                             </p>{% endspaceless %}'));

@@ -23,14 +23,22 @@
         .logo a:hover{ text-decoration: none; }
         footer{ margin: 5em 0 2em; padding: 2em 0; }
     </style>
+    {% block extra_css %}
+    {% endblock %}
 </head>
 <body>
 
 <section>
     <div class="container">
-        <header>
-            <h3 class="logo"><a href="{% url "index" %}"><img src="{% static "img/pe-logo.png" %}" /> Progressive Events</a></h3>
-        </header>
+        <div class="row">
+            <div class="col-sm-6">
+                <header>
+                    <h3 class="logo"><a href="{% url "index" %}"><img src="{% static "img/pe-logo.png" %}" /> Progressive Events</a></h3>
+                </header>
+            </div>
+            {% block navbar %}
+            {% endblock %}
+        </div>
     </div>
 </section>
 
@@ -57,32 +65,11 @@
             <p>ProgressiveEvents.org is a <a href="http://www.jonculver.com/">Jon Culver</a> production, &copy; 2016&ndash;&infin;.<br />
                 Want to help out? <a href="mailto:jon.c.culver@gmail.com">Get in touch</a> and let's blow this thing up!</p>
         </footer>
+    </div>
+</section>
 
-
-<script src="{% static "js/progressive-events.js" %}"></script>
-<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-<script>
-    var map = L.map('map', {
-        scrollWheelZoom: false
-    }).setView([{{ point.y }}, {{ point.x }}], 13);
-
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    var points = [];
-
-    {% for event in events %}
-
-        points.push(L.marker([{{ event.venue.point.y }}, {{ event.venue.point.x }}]).bindPopup('{{ event.title }}'));
-
-    {% endfor %}
-
-    var markerGroup = L.featureGroup(points);
-    markerGroup.addTo(map);
-    map.fitBounds(markerGroup.getBounds().pad(0.2));
-</script>
-
+{% block scripts_footer %}
+{% endblock %}
 
 </body>
 </html>

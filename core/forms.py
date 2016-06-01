@@ -1,6 +1,7 @@
-from django import forms
+from django.contrib.gis import forms
+from django.contrib.gis.forms import PointField
 from django.utils.html import mark_safe
-from .models import Event
+from .models import Event, Venue, Organization
 
 
 # super hacky womp womp
@@ -22,3 +23,48 @@ class SearchForm(forms.Form):
     address = forms.CharField(widget=forms.TextInput(attrs={'class': 'hidden', 'required': 'required'}))
     days = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'hidden', 'required': 'required'}))
     event_types = forms.MultipleChoiceField(choices=Event.EVENT_TYPE_CHOICES, widget=CheckboxSelectMultipleULAttrs(ulattrs='class="list-unstyled hidden event-type-list"'))
+
+
+class VenueForm(forms.ModelForm):
+    # point = forms.PointField(geom_type='Point', widget=forms.OSMWidget(attrs={'default_lon': -122, 'default_lat': 47, 'readonly': True }))
+
+    class Meta:
+        model = Venue
+        exclude = ['slug']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3})
+        }
+        labels = {
+            'title': 'Venue Name',
+            # 'point': 'Location',
+            'url': 'URL'
+        }
+
+
+
+class OrganizationForm(forms.ModelForm):
+
+    class Meta:
+        model = Organization
+        exclude = []
+        labels = {
+            'url': 'URL'
+        }
+
+
+class EventForm(forms.ModelForm):
+
+    class Meta:
+        model = Event
+        exclude = ['venue', 'host']
+        labels = {
+            'start': 'Start Time',
+            'end': 'End Time',
+            'recurrences': 'Date / Recurring Schedule',
+            'url': 'URL'
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'start': forms.TimeInput(attrs={'type': 'time'}),
+            'end': forms.TimeInput(attrs={'type': 'time'})
+        }

@@ -2,7 +2,6 @@ import googlemaps
 import json
 import os
 import redis
-from django.contrib.gis.geos import GEOSGeometry
 from django.conf import settings
 
 
@@ -19,6 +18,4 @@ def get_point(address):
             r.setex(address, json.dumps(location), 2592000)
         except:
             pass
-    point = GEOSGeometry('POINT(%(lng)s %(lat)s)' % {'lng': location['lng'], 'lat': location['lat']}, srid=4326)
-
-    return point
+    return {'x': location['lng'], 'y': location['lat']}

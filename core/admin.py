@@ -11,16 +11,6 @@ class VenueAdmin(admin.OSMGeoAdmin):
     list_display = ['title', 'address', 'city', 'state']
     list_filter = ['state']
 
-    def save_model(self, request, obj, form, change):
-        if not obj.point:
-            obj.point = Point(0,0)
-            address = ', '.join([obj.address, obj.city, obj.state, obj.zipcode])
-            geolocator = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
-            geocoded_address = geolocator.geocode(address)
-            location = geocoded_address[0]['geometry']['location']
-            obj.point.x, obj.point.y = location['lng'], location['lat']
-        obj.save()
-
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.OSMGeoAdmin):

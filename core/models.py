@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 from datetime import datetime, timedelta
+from django.utils.text import slugify
 from django.utils.timezone import now
 from localflavor.us.models import PhoneNumberField, USStateField, USZipCodeField
 from recurrence.fields import RecurrenceField
+
+from .utils import get_point
 
 
 def round_hours(hours=1):
@@ -19,7 +23,7 @@ class Venue(models.Model):
     city = models.CharField(max_length=255)
     state = USStateField()
     zipcode = USZipCodeField(blank=True)
-    slug = models.SlugField()
+    slug = models.SlugField(blank=True, null=True)
     phone = PhoneNumberField(blank=True)
     url = models.URLField(blank=True)
     email = models.EmailField(blank=True)
@@ -27,6 +31,13 @@ class Venue(models.Model):
     keywords = models.CharField(blank=True, max_length=255)
     point = models.PointField(blank=True, null=True)
     objects = models.GeoManager()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        if self.address and not self.point:
+            self.point = Point(**get_point(' '.join([self.address, self.city, self.state, self.zipcode])))
+        return super(Venue, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.title

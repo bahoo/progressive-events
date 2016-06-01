@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+
+{% block extra_css %}
+<style type="text/css">
+div.recurrence-widget{ height: auto; }
+div.recurrence-widget .radio, div.recurrence-widget .checkbox{ display: inline; }
+h4{ margin-top: 1em; }
+hr{ clear: both; margin-top: 4em; margin-bottom: 2em; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-8">
+
+                    <h3>Add an Event</h3>
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+
+                        {{ event_form.media }}
+                        {{ venue_form.media }}
+                        {{ organization_form.media }}
+
+                        <h4>Event Details:</h4>
+                        {% bootstrap_form_errors event_form %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field event_form.title %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field event_form.description %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field event_form.url %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field event_form.recurrences %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                {% bootstrap_field event_form.start %}
+                            </div>
+                            <div class="col-xs-6">
+                                {% bootstrap_field event_form.end %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field event_form.event_type %}
+                            </div>
+                        </div>
+                        
+                        
+                        <hr />
+
+                        <h4>Event Venue Details:</h4>
+                        <p>Where is this taking place?</p>
+                        {% bootstrap_form_errors venue_form %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field venue_form.title %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field venue_form.address %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field venue_form.city %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-6">
+                                {% bootstrap_field venue_form.state %}
+                            </div>
+                            <div class="col-xs-6">
+                                {% bootstrap_field venue_form.zipcode %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field venue_form.url %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                {% bootstrap_field venue_form.phone %}
+                            </div>
+                            <div class="col-xs-6">
+                                {% bootstrap_field venue_form.email %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {% bootstrap_field venue_form.description %}
+                            </div>
+                        </div>
+                        
+                        <hr />
+
+                        <h4>Hosting Organization Details:</h4>
+                        <p>What group is putting on this event? Tell us about them:</p>
+                        {% bootstrap_form_errors organization_form %}
+                        {% bootstrap_form organization_form %}
+                        <hr />
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

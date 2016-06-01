@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block navbar %}
+    <div class="col-sm-6 text-right">
+        <a href="{% url "add" %}" class="btn btn-primary" style="margin-top: 1.25em;"><span class="glyphicon glyphicon-plus-sign"></span> Add Event</a>
+    </div>
+{% endblock %}
+
 
 {% block content %}
 
@@ -22,7 +30,7 @@
                 {% include "search-form.html" %}
 
                 {% for event in events %}
-                    <div class="event-item row">
+                    <div class="event-item row" id="{{ event.title | slugify }}-{{ event.pk }}">
                         <div class="col-sm-7">
                             <h4>
                                 {{ event.title }}
@@ -76,4 +84,46 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block scripts_footer %}
+<script src="{% static "js/progressive-events.js" %}"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script>
+    var map = L.map('map', {
+        scrollWheelZoom: false
+    }).setView([{{ point.y }}, {{ point.x }}], 13);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var points = [];
+
+    {% for event in events %}
+
+        points.push(L.marker([{{ event.venue.point.y }}, {{ event.venue.point.x }}])
+                .bindPopup('{% spaceless %}
+                            <h5>{{ event.title }}</h5>
+                            {% if event.venue.address %}
+                                <p>
+                                    <a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><span class="glyphicon glyphicon-map-marker" style="margin-right: 0.33em;"></span><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a>
+                                </p>
+                            {% endif %}
+                            {% if event.description %}
+                                <p>{{ event.description | safe }}</p>
+                            {% endif %}
+                            <p>
+                                {% if event.url %}
+                                    <a href="{{ event.url }}" target="_blank"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>{{ event.url }}</a><br />
+                                {% endif %}
+                                <a href="#{{ event.title | slugify }}-{{ event.pk }}"><span class="glyphicon glyphicon-info-sign" style="margin-right: 0.33em"></span>Jump to listing</a>
+                            </p>{% endspaceless %}'));
+
+    {% endfor %}
+
+    var markerGroup = L.featureGroup(points);
+    markerGroup.addTo(map);
+    map.fitBounds(markerGroup.getBounds().pad(0.2));
+</script>
 {% endblock %}

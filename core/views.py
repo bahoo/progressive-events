@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 
-from .forms import SearchForm
+
+from .forms import SearchForm, VenueForm, OrganizationForm, EventForm
 from .models import Event, Venue
 from .utils import get_point
 
@@ -22,7 +24,7 @@ class MapView(TemplateView):
         distance = int(search_form.data.get('distance', initial_data.get('distance')))
         days = int(search_form.data.get('days', initial_data.get('days')))
 
-        point = get_point(address)
+        point = GEOSGeometry('POINT(%(x)s %(y)s)' % get_point(address), srid=4326)
 
         type_filter = Q()
         event_types = self.request.GET.getlist('event_types', initial_data.get('event_types', []))
@@ -37,6 +39,44 @@ class MapView(TemplateView):
         context['future'] = datetime.now() + timedelta(days=days)
         context['search_form'] = search_form
         context['point'] = point
+
+        return context
+
+
+class AddView(TemplateView):
+    template_name = 'add.html'
+
+    def post(self, *args, **kwargs):
+        venue_form = VenueForm(self.request.POST or None, prefix='venue')
+        event_form = EventForm(self.request.POST or None, prefix='event')
+        organization_form = OrganizationForm(self.request.POST or None, prefix='organization')
+
+        if venue_form.is_valid() and \
+                event_form.is_valid() and \
+                organization_form.is_valid():
+            organization = organization_form.save()
+            venue = venue_form.save()
+            event = event_form.save(commit=False)
+            event.host = organization
+            event.venue = venue
+            event.save()
+
+            # todo: add a success message.
+
+            return redirect('/')
+
+        return self.get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(AddView, self).get_context_data(**kwargs)
+
+        # probably a more DIY friendly way to do this with multiple forms but
+        venue_form = VenueForm(self.request.POST or None, prefix='venue')
+        event_form = EventForm(self.request.POST or None, prefix='event')
+        organization_form = OrganizationForm(self.request.POST or None, prefix='organization')
+        context['venue_form'] = venue_form
+        context['event_form'] = event_form
+        context['organization_form'] = organization_form
 
         return context
 

@@ -1,1 +1,1 @@
-web: gunicorn demevents.wsgi --log-file - --timeout 360
+web: gunicorn progressive_events.wsgi --log-file - --timeout 360

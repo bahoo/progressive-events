@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load event_dates %}
+
+{% block content %}
+
+    <section>
+        <div id="map""></div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8">
+                    <h2>{{ event.title }}</h2>
+                    {% if event.host %}<h4 class="text-muted">hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</h4>{% endif %}
+
+                    {% if event.description %}
+                        <p>{{ event.description | linebreaksbr | urlize }}</p>
+                    {% endif %}
+
+                    {% if event.venue.address %}
+                        <p><span class="glyphicon glyphicon-map-marker text-muted" style="margin-right: 0.33em;"></span><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a></p>
+                    {% endif %}
+
+                    {% if event.url %}
+                        <p><span class="glyphicon glyphicon-link text-muted"></span> More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a></p>
+                    {% endif %}
+
+                    {% event_dates event days=30 as dates %}
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-calendar"></span>
+                                {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
+                            <p>
+                                {% for date in dates|slice:"0:3" %}
+                                    {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    {% if event.start %}
+                        <div class="col-sm-4">
+                            <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-time"></span> Time:</h5>
+                            <p>{{ event.start }} {% if event.end %}&ndash; {{ event.end }}{% endif %}</p>
+                        </div>
+                    {% endif %}
+                    {% if event.recurrences.rrules %}
+                        <div class="col-sm-4">
+                            <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-repeat"></span> Schedule:</h5>
+                            <ul class="list-unstyled">
+                                {% for rule in event.recurrences.rrules %}
+                                    <li>{{ rule.to_text | title }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+
+{% block scripts_footer %}
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script>
+        var map = L.map('map', {
+            scrollWheelZoom: false
+        }).setView([{{ event.venue.point.y }}, {{ event.venue.point.x }}], 13);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.marker([{{ event.venue.point.y }}, {{ event.venue.point.x }}])
+                        .addTo(map)
+                        .bindPopup('{% spaceless %}
+                                    {% if event.venue.address %}
+                                        <h5 style="white-space: nowrap"><span class="glyphicon glyphicon-map-marker" style="margin-right: 0.33em;"></span><b>{{ event.venue.title }}</b></h5>
+                                        <span class="text-muted">{{ event.venue.address }}<br />{{ event.venue.city }}, {{ event.venue.state }} {{ event.venue.zipcode }}</span>
+                                    {% endif %}
+                                    {% endspaceless %}')
+                        .openPopup();
+
+    </script>
+{% endblock %}

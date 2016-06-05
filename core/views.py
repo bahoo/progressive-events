@@ -9,12 +9,18 @@ from django.contrib.gis.measure import D
 from django.db.models import Q
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
-from django.views.generic import TemplateView, View
+from django.views.generic import DetailView, TemplateView, View
 
 
 from .forms import SearchForm, VenueForm, OrganizationForm, EventForm
 from .models import Event, Venue
 from .utils import get_point
+
+
+
+class EventDetailView(DetailView):
+    template_name = 'event_detail.html'
+    model = Event
 
 
 

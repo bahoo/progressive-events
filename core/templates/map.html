@@ -42,7 +42,7 @@
                             
 
                             {% if event.url %}
-                                <p><span class="glyphicon glyphicon-link text-muted"></span> More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a></p>
+                                <p><span class="glyphicon glyphicon-link text-muted"></span> <a href="{{ event.get_absolute_url }}">Details</a> | More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a></p>
                             {% endif %}
                         </div>
 

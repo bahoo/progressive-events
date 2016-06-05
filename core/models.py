@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
+from django.core.urlresolvers import reverse
 from datetime import datetime, timedelta
 from django.utils.text import slugify
 from django.utils.timezone import now
@@ -23,7 +24,7 @@ class Venue(models.Model):
     city = models.CharField(max_length=255)
     state = USStateField()
     zipcode = USZipCodeField(blank=True)
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True, max_length=255)
     phone = PhoneNumberField(blank=True)
     url = models.URLField(blank=True)
     email = models.EmailField(blank=True)
@@ -34,7 +35,7 @@ class Venue(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title)[0:255]
         if self.address and not self.point:
             self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
         return super(Venue, self).save(*args, **kwargs)
@@ -52,11 +53,17 @@ class Organization(models.Model):
         )
     title = models.CharField(max_length=255)
     url = models.URLField(blank=True)
+    slug = models.SlugField(blank=True, null=True, max_length=255) 
     organization_type = models.CharField(max_length=255, choices=ORG_TYPE_CHOICES, null=True, blank=True)
     objects = models.GeoManager()
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)[0:255]
+        return super(Organization, self).save(*args, **kwargs)
 
 
 class EventQueryset(models.query.GeoQuerySet):
@@ -83,6 +90,7 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     venue = models.ForeignKey(Venue, null=True, blank=True)
     url = models.URLField(blank=True)
+    slug = models.SlugField(blank=True, null=True, max_length=255)
     description = models.TextField(blank=True)
     start = models.TimeField(default=round_hours)
     end = models.TimeField(default=round_two_hours)
@@ -93,6 +101,14 @@ class Event(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("event_detail", kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)[0:255]
+        return super(Event, self).save(*args, **kwargs)
 
     def dates(self, *args, **kwargs):
         if not kwargs:

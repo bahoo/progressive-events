@@ -49,7 +49,7 @@ class OrganizationForm(forms.ModelForm):
 
     class Meta:
         model = Organization
-        exclude = []
+        exclude = ['slug']
         labels = {
             'url': 'URL'
         }
@@ -59,7 +59,7 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ['venue', 'host']
+        exclude = ['venue', 'host', 'slug']
         labels = {
             'start': 'Start Time',
             'end': 'End Time',

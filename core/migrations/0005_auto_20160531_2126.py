@@ -5,6 +5,14 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
+def auto_save_venues(apps, schema_editor):
+    print "supsss"
+    Venue = apps.get_model('core', 'Venue')
+    for v in Venue.objects.all():
+        v.save()
+
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,6 +23,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='venue',
             name='slug',
-            field=models.SlugField(blank=True, null=True),
+            field=models.SlugField(blank=True, null=True, max_length=255),
         ),
+        migrations.RunPython(auto_save_venues, reverse_code=migrations.RunPython.noop)
     ]

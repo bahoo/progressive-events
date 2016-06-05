@@ -11,6 +11,25 @@ var sigo = function(){
             self.bind();
         },
 
+        utils: {
+
+            getElementPosition: function (field){
+                var offsetLeft = 0;
+                var offsetTop = 0;
+                while (field) {
+                    offsetLeft += field.offsetLeft;
+                    offsetTop += field.offsetTop;
+                    field = field.offsetParent;
+                }
+
+                return {
+                    left: offsetLeft,
+                    top: offsetTop
+                };
+            }
+
+        },
+
         getElementById: function(elem){
 
             if(typeof elem == 'object'){
@@ -48,7 +67,7 @@ var sigo = function(){
                 return true;
             }
 
-            self.getElementById(self.destination).value = li.getAttribute('data-venue_id');
+            self.getElementById(self.destination).value = li.getAttribute('data-id');
             self.hideAndDisableForm();
             self.getElementById(self.input).value = li.innerText;
 
@@ -126,13 +145,13 @@ var sigo = function(){
                 var li = document.createElement('li');
                 li.classList.add('list-group-item');
                 var item = response[i];
+                // super secure.
                 li.innerHTML = eval("`" + self.template + "`");
-                li.setAttribute('data-venue_id', response[i].id);
+                li.setAttribute('data-id', response[i].id);
                 list.appendChild(li);
             }
 
-            list.style.position = 'absolute';
-            var fieldPosition = progressive_events.utils.getElementPosition(self.getElementById(self.input));
+            var fieldPosition = self.utils.getElementPosition(self.getElementById(self.input));
             list.style.position = 'absolute';
             list.style.left = fieldPosition.left + 'px';
             list.style.top = fieldPosition.top + self.getElementById(self.input).offsetHeight + 5 + 'px';

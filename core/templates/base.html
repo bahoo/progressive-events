@@ -9,39 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-    <style>
-        #map{ width: 100%; min-height: 25em; }
-        @media (min-width: 1201px){
-            #map{ min-height: 35em; }
-        }
-        .event-item{ padding: 1em 0; border-bottom: 1px #ccc solid; }
-        .event-item:target{ background: #cceeff; }
-        [contenteditable]{ cursor: pointer; padding: 1px 5px; border-color: #99ccff; border-width: 1px; border-style: solid; border-radius: 4px; }
-        [contenteditable]:focus{ cursor: text; outline: none; background: #cceeff; border-color: #0099ff; }
-        [contenteditable].invalid{ border-color: #ff9900; background: #ffeecc; }
-
-        .search-form{ max-width: 80%; margin-left: auto; margin-right: auto; }
-        .search-form .event-type-list{ transition: left 0.2s ease-out, top 0.2s ease-out; background: #fff; border-radius: 10px; padding: 0.5em; box-shadow: 0 2px 8px #888; z-index: 1; text-align: left; }
-        .search-form .event-type-list label{ text-transform: lowercase; font-weight: normal; font-size: 0.8em; cursor: pointer; }
-
-        .link{ word-break: break-all }
-
-        .event-sidebar h5{ margin: 0 0 10px; }
-        @media (max-width: 767px){
-            .xs-inline{ display: inline-block; }
-            .xs-inline + p, .xs-inline + ul{ display: inline-block; margin: 0 0 10px; }
-        }
-
-        .logo a:hover{ text-decoration: none; }
-        .logo img{ vertical-align: -0.5em; }
-
-
-        .autocomplete-list{ cursor: pointer; }
-        .autocomplete-list li:hover{ background: #cceeff; }
-
-
-        footer{ margin: 5em 0 2em; padding: 2em 0; }
-    </style>
+    <link rel="stylesheet" href="{% static "css/progressive-events.css" %}" />
     {% block extra_css %}
     {% endblock %}
 </head>

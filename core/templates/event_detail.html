@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <section>
+    <section style="margin: 1.5em 0">
         <div id="map""></div>
     </section>
 
@@ -55,6 +55,16 @@
                         </div>
                     {% endif %}
                     </div>
+
+                </div>
+                <div class="col-sm-4">
+
+                    <h5>Make a plan to get there:</h5>
+
+                    <ul>
+                        <li><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank">Get Directions</a></li>
+                        <!-- iCal / etc. export -->
+                    </ul>
 
                 </div>
             </div>

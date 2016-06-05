@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block extra_head %}
-    <meta property="og:url" content="http://www.progressiveevents.org{{ event.get_absolute_url }}" />
+{% block og_meta %}
     <meta property="og:title" content="{{ event.title }} | Progressive Events" />
+    <meta property="og:url" content="http://www.progressiveevents.org{{ event.get_absolute_url }}" />
     <meta property="og:description" content="{{ event.description | striptags | truncatechars:200 }}" />
+    <meta property="og:image" content="http://www.progressiveevents.org{% static "img/pe-og.png" %}" />
 {% endblock %}
 
 {% load event_dates %}

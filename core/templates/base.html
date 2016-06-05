@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="{% static "css/progressive-events.css" %}" />
     {% block extra_css %}
     {% endblock %}
+
     {% block extra_head %}
+
+        {% block og_meta %}
+            <meta property="og:title" content="Progressive Events" />
+            <meta property="og:url" content="http://www.progressiveevents.org" />
+            <meta property="og:image" content="http://www.progressiveevents.org{% static "img/pe-og.png" %}" />
+            <meta property="og:description" content="Decisions get made by people who show up. Progressive Events is here to point you to events in your community so you can be part of that process." />
+        {% endblock %}
+        
     {% endblock %}
 </head>
 <body>

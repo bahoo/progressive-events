@@ -33,6 +33,12 @@
 
         .logo a:hover{ text-decoration: none; }
         .logo img{ vertical-align: -0.5em; }
+
+
+        .autocomplete-list{ cursor: pointer; }
+        .autocomplete-list li:hover{ background: #cceeff; }
+
+
         footer{ margin: 5em 0 2em; padding: 2em 0; }
     </style>
     {% block extra_css %}
@@ -53,6 +59,16 @@
         </div>
     </div>
 </section>
+
+{% if messages %}
+    <section style="margin-top: 1em">
+        <div class="container">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
 
 {% block content %}
 

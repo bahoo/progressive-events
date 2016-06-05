@@ -26,7 +26,7 @@ class SearchForm(forms.Form):
 
 
 class VenueForm(forms.ModelForm):
-    # point = forms.PointField(geom_type='Point', widget=forms.OSMWidget(attrs={'default_lon': -122, 'default_lat': 47, 'readonly': True }))
+    venue_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Venue
@@ -36,9 +36,12 @@ class VenueForm(forms.ModelForm):
         }
         labels = {
             'title': 'Venue Name',
-            # 'point': 'Location',
             'url': 'URL'
         }
+
+    class Media:
+        js = ('js/sigo.js', 'js/add-form.js')
+
 
 
 

@@ -23,7 +23,6 @@ var progressive_events = function(){
         },
 
         bind: function(){
-            self.searchForm.bind();
             return self;
         },
 
@@ -37,6 +36,8 @@ var progressive_events = function(){
                 document.addEventListener('click', self.searchForm.hideChecklist);
 
                 self.searchForm.eventTypeClick({'target': document.querySelector('#id_event_types input')});
+
+                return self;
             },
 
             eventTypeClick: function(e){

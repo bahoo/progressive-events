@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load bootstrap3 %}
+{% load static %}
 
 {% block extra_css %}
 <style type="text/css">
@@ -74,43 +75,46 @@ hr{ clear: both; margin-top: 4em; margin-bottom: 2em; }
                             <div class="col-xs-12">
                                 {% bootstrap_field venue_form.title %}
                             </div>
+                            {% bootstrap_field venue_form.venue_id %}
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                {% bootstrap_field venue_form.address %}
+                        <div id="venue_form">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% bootstrap_field venue_form.address %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                {% bootstrap_field venue_form.city %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% bootstrap_field venue_form.city %}
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-xs-6">
-                                {% bootstrap_field venue_form.state %}
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    {% bootstrap_field venue_form.state %}
+                                </div>
+                                <div class="col-xs-6">
+                                    {% bootstrap_field venue_form.zipcode %}
+                                </div>
                             </div>
-                            <div class="col-xs-6">
-                                {% bootstrap_field venue_form.zipcode %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% bootstrap_field venue_form.url %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                {% bootstrap_field venue_form.url %}
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    {% bootstrap_field venue_form.phone %}
+                                </div>
+                                <div class="col-xs-6">
+                                    {% bootstrap_field venue_form.email %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-6">
-                                {% bootstrap_field venue_form.phone %}
-                            </div>
-                            <div class="col-xs-6">
-                                {% bootstrap_field venue_form.email %}
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-xs-12">
-                                {% bootstrap_field venue_form.description %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% bootstrap_field venue_form.description %}
+                                </div>
                             </div>
                         </div>
                         
@@ -131,4 +135,9 @@ hr{ clear: both; margin-top: 4em; margin-bottom: 2em; }
         </div>
     </section>
 
+{% endblock %}
+
+
+{% block scripts_footer %}
+<script src="{% static "js/progressive-events.js" %}"></script>
 {% endblock %}

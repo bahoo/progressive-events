@@ -9,6 +9,7 @@ var sigo = function(){
             self.form = form;
             self.template = template;
             self.bind();
+            self.hideAndDisableForm();
         },
 
         utils: {
@@ -96,7 +97,9 @@ var sigo = function(){
                         if(response.length){
                             self.initWidget(response);
                         } else {
+                            self.hideAutocompleteWidget();
                             self.showAndEnableForm();
+                            self.getElementById(self.destination).value = '';
                         }
                     }
                 }

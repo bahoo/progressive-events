@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'recurrence',
+    'rest_framework',
     'core'
 ]
 

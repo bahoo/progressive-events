@@ -7,9 +7,8 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.db.models import Q
-from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView, TemplateView, View
+from django.views.generic import DetailView, TemplateView
 
 
 from .forms import SearchForm, VenueForm, OrganizationForm, EventForm
@@ -21,25 +20,6 @@ from .utils import get_point
 class EventDetailView(DetailView):
     template_name = 'event_detail.html'
     model = Event
-
-
-
-class MiniAPIView(View):
-    search_field = 'title'
-    api_fields = ['id', 'title']
-
-    def get_searches(self, request):
-        if request.GET.get('search'):
-            return {'%s__icontains' % self.search_field: request.GET.get('search')}
-        return {}
-
-    def get(self, request, *args, **kwargs):
-        return JsonResponse(list(self.model.objects.filter(**self.get_searches(request)).values(*self.api_fields)), safe=False)
-
-
-class VenueAPIView(MiniAPIView):
-    model = Venue
-    api_fields = ['id', 'title', 'address', 'city', 'state', 'zipcode']
 
 
 class MapView(TemplateView):

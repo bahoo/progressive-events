@@ -33,3 +33,8 @@ Then set some variables in your `.env` file:
     echo "SECRET_KEY=[ Secret Key goes here ]" > .env
     echo "GOOGLE_MAPS_API_KEY=[ Google API Key goes here ]" > .env
     echo "REDIS_URL=[ Redis URL goes here ]" > .env
+    
+    
+## Commands
+
+`python manage.py load_meetup data/meetup-urls.txt` - Grab all meetup data from Progressive meetup groups.

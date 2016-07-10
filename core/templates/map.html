@@ -33,7 +33,11 @@
                             </h4>
                             
                             {% if event.description %}
-                                <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | linebreaksbr | urlize }}</p>
+                                <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted pull-left" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | safe | truncatewords:"50" | linebreaksbr }} 
+                                  
+                                    <a href="{{ event.get_absolute_url }}">Show Full Details</a>
+                                
+                                </p>
                             {% endif %}
                             
                             {% if event.venue.address %}

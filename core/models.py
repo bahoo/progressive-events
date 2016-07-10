@@ -37,7 +37,10 @@ class Venue(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)[0:255]
         if self.address and not self.point:
-            self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
+            if self.zipcode:
+                self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
+            else:
+                self.point = Point(**get_point(', '.join([self.address, self.city, self.state])))
         return super(Venue, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -93,7 +96,7 @@ class Event(models.Model):
     slug = models.SlugField(blank=True, null=True, max_length=255)
     description = models.TextField(blank=True)
     start = models.TimeField(default=round_hours)
-    end = models.TimeField(default=round_two_hours)
+    end = models.TimeField(default=round_two_hours,null=True)
     recurrences = RecurrenceField(null=True)
     event_type = models.CharField(max_length=255, choices=EVENT_TYPE_CHOICES, null=True, blank=True)
     host = models.ForeignKey(Organization, blank=True, null=True)
@@ -107,8 +110,11 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)[0:255]
-        return super(Event, self).save(*args, **kwargs)
+            super(Event, self).save(*args, **kwargs)
+            self.slug = slugify(self.title + '-' + str(self.id))[0:255]
+            self.save()
+        else:
+            return super(Event, self).save(*args, **kwargs)
 
     def dates(self, *args, **kwargs):
         if not kwargs:

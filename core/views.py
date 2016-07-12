@@ -48,7 +48,7 @@ class MapView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapView, self).get_context_data(**kwargs)
 
-        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30', 'event_types': list(k for (k, v) in Event.EVENT_TYPE_CHOICES)}
+        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30'}
 
         for k, v in initial_data.iteritems():
             if self.request.GET.get(k, None):
@@ -62,8 +62,9 @@ class MapView(TemplateView):
         point = GEOSGeometry('POINT(%(x)s %(y)s)' % get_point(search_form.data['address']), srid=4326)
 
         event_type_filter = Q()
-        for event_type in search_form.data['event_types']:
-            event_type_filter = event_type_filter | Q(event_type=event_type)
+        if search_form.data.get('event_types', None):
+            for event_type in search_form.data['event_types']:
+                event_type_filter = event_type_filter | Q(event_type=event_type)
 
         events = Event.objects.filter(event_type_filter).filter(venue__point__distance_lte=(point, D(mi=float(search_form.data['distance'])))).select_related('venue', 'host').filter_by_date(days=int(search_form.data['days'])).annotate(distance=Distance('venue__point', point)).order_by('distance')
 

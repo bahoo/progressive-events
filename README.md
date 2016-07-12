@@ -38,3 +38,5 @@ Then set some variables in your `.env` file:
 ## Commands
 
 `python manage.py load_meetup data/meetup-urls.txt` - Grab all meetup data from Progressive meetup groups.
+
+`python manage.py load_bnc` - Grab all BNC data. (Will refactor to allow all NationBuilder events to be taken)

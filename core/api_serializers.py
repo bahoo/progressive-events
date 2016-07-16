@@ -21,4 +21,4 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        exclude = []
+        exclude = ['recurrences']

@@ -48,21 +48,25 @@ class MapView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapView, self).get_context_data(**kwargs)
 
-        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30'}
+        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30',
+                            'event_types': list(k for (k, v) in Event.EVENT_TYPE_CHOICES)}
+
+        replacement_data = {}
 
         for k, v in initial_data.iteritems():
             if self.request.GET.get(k, None):
                 if k == 'event_types':
-                    initial_data[k] = self.request.GET.getlist(k)
+                    replacement_data[k] = self.request.GET.getlist(k)
                 else:
-                    initial_data[k] = self.request.GET.get(k)
+                    replacement_data[k] = self.request.GET.get(k)
 
-        search_form = SearchForm(initial_data)
+        search_form = SearchForm(dict(initial_data, **replacement_data))
 
         point = GEOSGeometry('POINT(%(x)s %(y)s)' % get_point(search_form.data['address']), srid=4326)
 
         event_type_filter = Q()
-        if search_form.data.get('event_types', None):
+        event_types = search_form.data.get('event_types', None)
+        if event_types and len(event_types) != len(Event.EVENT_TYPE_CHOICES):
             for event_type in search_form.data['event_types']:
                 event_type_filter = event_type_filter | Q(event_type=event_type)
 

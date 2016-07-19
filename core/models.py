@@ -86,6 +86,12 @@ class Event(models.Model):
             ('party-event', 'Party Event'),
             ('governing-body-event', 'Governing Body Event'),
             ('volunteer', 'Volunteering Event'),
+            # (None, 'Uncategorized Event'),
+            # todo: flesh this out further.
+            # ('community', 'Community Meetup / Gathering'),
+            # ('advocacy', 'Advocacy'),
+            # ('rally', 'Rally'),
+            # ('forum', 'Forum'),
         )
     title = models.CharField(max_length=255)
     venue = models.ForeignKey(Venue, null=True, blank=True)

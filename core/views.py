@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, TemplateView
 
-from .api import EventFilter
+from .api import EventFilterBackend
 from .forms import VenueForm, OrganizationForm, EventForm
 from .models import Event, Venue
 
@@ -22,10 +22,10 @@ class MapView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapView, self).get_context_data(**kwargs)
 
-        event_filter = EventFilter()
-        search_form = event_filter.prepare_search_form(request=self.request)
-        point = event_filter.get_point(search_form['address'])
-        context['events'] = event_filter.filter_queryset(request=self.request, queryset=Event.objects.all(), view=self, search_form=search_form, point=point)
+        event_filter_backend = EventFilterBackend()
+        search_form = event_filter_backend.prepare_search_form(request=self.request)
+        point = event_filter_backend.get_point(search_form['address'])
+        context['events'] = event_filter_backend.filter_queryset(request=self.request, queryset=Event.objects.all(), view=self, search_form=search_form, point=point)
         
         context['now'] = datetime.now()
         context['future'] = datetime.now() + timedelta(days=int(search_form.data['days']))
@@ -38,7 +38,9 @@ class MapView(TemplateView):
 class EmbedView(TemplateView):
     template_name = 'embed.html'
 
-    def get_context_data(self, **kwargs):
+
+class EmbedTestView(TemplateView):
+    template_name = 'embed-test.html'
 
 
 class AddView(TemplateView):

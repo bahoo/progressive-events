@@ -1,3 +1,5 @@
+import django_filters
+
 from django.conf.urls import url
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
@@ -12,7 +14,7 @@ from .models import Event, Organization, Venue
 from .utils import get_point
 
 
-class EventFilter(filters.BaseFilterBackend):
+class EventFilterBackend(filters.BaseFilterBackend):
 
     def prepare_search_form(self, request):
 
@@ -49,14 +51,23 @@ class EventFilter(filters.BaseFilterBackend):
                         .select_related('venue', 'host') \
                         .filter_by_date(days=int(search_form.data['days'])) \
                         .annotate(distance=Distance('venue__point', point)) \
-                        .order_by('distance')    
+                        .order_by('distance')
+
+
+class EventFilter(filters.FilterSet):
+    org = django_filters.CharFilter(name='host__slug')
+
+    class Meta:
+        model = Event
+        fields = ['org']
 
 
 class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    filter_backends = (filters.DjangoFilterBackend, EventFilter)
-    filter_fields = ['host__slug', 'event_type']
+    filter_backends = (filters.DjangoFilterBackend, EventFilterBackend)
+    filter_class = EventFilter
+    filter_fields = ['event_type', 'org']
 
 
 class OrganizationList(generics.ListAPIView):

@@ -27,6 +27,11 @@ class EventFilterBackend(filters.BaseFilterBackend):
                 else:
                     initial_data[k] = request.GET.get(k)
 
+
+        # hacks on hacks on hacks
+        if request.GET.get('org', None) and not request.GET.get('address', None):
+            del initial_data['address']
+
         search_form = SearchForm(initial_data)
 
         return search_form
@@ -39,19 +44,26 @@ class EventFilterBackend(filters.BaseFilterBackend):
         if not search_form:
             search_form = self.prepare_search_form(request)
 
-        if not point:
-            point = self.get_point(search_form['address'])
+        if not point and search_form['address'].value():
+            point = self.get_point(search_form['address'].value())
 
         event_type_filter = Q()
         for event_type in search_form.data['event_types']:
             event_type_filter = event_type_filter | Q(event_type=event_type)
 
-        return queryset.filter(event_type_filter) \
-                        .filter(venue__point__distance_lte=(point, D(mi=float(search_form.data['distance'])))) \
-                        .select_related('venue', 'host') \
-                        .filter_by_date(days=int(search_form.data['days'])) \
-                        .annotate(distance=Distance('venue__point', point)) \
+        queryset = queryset.filter(event_type_filter)
+
+        if point and search_form.data['distance']:
+            queryset = queryset.filter(venue__point__distance_lte=(point, D(mi=float(search_form.data['distance']))))
+
+        queryset = queryset.select_related('venue', 'host') \
+                        .filter_by_date(days=int(search_form.data['days']))
+
+        if point and search_form.data['distance']:
+            queryset = queryset.annotate(distance=Distance('venue__point', point)) \
                         .order_by('distance')
+
+        return queryset
 
 
 class EventFilter(filters.FilterSet):

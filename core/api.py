@@ -56,10 +56,11 @@ class EventFilterBackend(filters.BaseFilterBackend):
 
 class EventFilter(filters.FilterSet):
     org = django_filters.CharFilter(name='host__slug')
+    event = django_filters.CharFilter(name='slug')
 
     class Meta:
         model = Event
-        fields = ['org']
+        fields = ['event', 'org']
 
 
 class EventList(generics.ListAPIView):
@@ -67,7 +68,7 @@ class EventList(generics.ListAPIView):
     serializer_class = EventSerializer
     filter_backends = (filters.DjangoFilterBackend, EventFilterBackend)
     filter_class = EventFilter
-    filter_fields = ['event_type', 'org']
+    filter_fields = ['event', 'event_type', 'org']
 
 
 class OrganizationList(generics.ListAPIView):
@@ -76,7 +77,17 @@ class OrganizationList(generics.ListAPIView):
     filter_backends = (filters.DjangoFilterBackend,)
 
 
+class VenueFilter(filters.FilterSet):
+    search = django_filters.CharFilter(name='title', lookup_expr='icontains')
+
+    class Meta:
+        model = Venue
+        fields = ['search']
+
+
 class VenueList(generics.ListAPIView):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
     filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = VenueFilter
+    filter_fields = ['search']

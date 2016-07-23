@@ -18,7 +18,7 @@ class VenueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Venue
-        exclude = ['id']
+        exclude = []
 
 
 class EventSerializer(serializers.ModelSerializer):

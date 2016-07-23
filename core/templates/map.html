@@ -81,11 +81,21 @@
                             {% endif %}
                         </div>
                     </div>
+
                 {% empty %}
                     <div class="event-item text-center" style="padding: 4em 0">
                         <h4>No events matching that search.</h4>
                     </div>
                 {% endfor %}
+
+
+                {% if request.GET and events %}
+                    <p class="text-center text-muted" style="margin: 2em 0"><span class="glyphicon glyphicon-pushpin"></span> Also, pro-tip &mdash; you can now <a href="#" onclick="event.preventDefault(); document.getElementById('embed').classList.remove('hidden');">embed these results on your site</a>!</p>
+                    <div id="embed" class="hidden">
+                        <textarea class="form-control" readonly="readonly"><script src="http://{{ request.get_host }}{% static "js/embed.js" %}" id="progressive-events-embed" data-filters="{{ request.GET.urlencode }}"></script></textarea>
+                    </div>
+                {% endif %}
+
             </div>
 
 

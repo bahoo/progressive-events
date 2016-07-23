@@ -75,6 +75,9 @@
                         <!-- iCal / etc. export -->
                     </ul>
 
+                    <h5>Embed this event:</h5>
+                    <textarea readonly="readonly" class="form-control" rows="5"><script src="http://{{ request.get_host }}{% static "js/embed.js" %}" id="progressive-events-embed" data-filters="event={{ event.slug }}"></script></textarea>
+
                 </div>
             </div>
         </div>

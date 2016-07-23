@@ -79,35 +79,26 @@ var progressive_events_embed = (function(){
                     var event = events[i];
 
                     points.push(L.marker([event.venue.point.y, event.venue.point.x])
-                            .bindPopup(`{% spaceless %}
-                                        <h5>${event.title}</h5>
-                                        {% if event.venue.address %}
-                                            <p>
-                                                <a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><span class="glyphicon glyphicon-map-marker" style="margin-right: 0.33em;"></span><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a>
-                                            </p>
-                                        {% endif %}
-                                        {% if event.description %}
-                                            <p>{{ event.description | linebreaksbr | safe }}</p>
-                                        {% endif %}
-                                        <p>
-                                            {% if event.url %}
-                                                <a href="{{ event.url }}" target="_blank" class="link"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>{{ event.url }}</a><br />
-                                            {% endif %}
-                                            <a href="#{{ event.title | slugify }}-{{ event.pk }}"><span class="glyphicon glyphicon-info-sign" style="margin-right: 0.33em"></span>Jump to listing</a>
-                                        </p>{% endspaceless %}`));
+                            // todo: need some way to 
+                            .bindPopup(`<h4>${event.title}</h4>
+                                        <p><a href="https://www.google.com/maps/place/${encodeURIComponent(event.venue.address)}%2C+${encodeURIComponent(event.venue.city)}%2C+${encodeURIComponent(event.venue.state)}+${encodeURIComponent(event.venue.zipcode)}" target="_blank"><b>${event.venue.title}</b><br /><span class="text-muted">${event.venue.address}, ${event.venue.city}</span></a></p>
+                                        <p>${event.description}</p>
+                                        <p><a href="${event.url}" target="_blank">${event.url}</a></p>`));
 
                 }
 
                 var markerGroup = L.featureGroup(points);
                 markerGroup.addTo(self.map);
-                self.map.fitBounds(markerGroup.getBounds().pad(0.2));
+                if(points.length > 1){
+                    self.map.fitBounds(markerGroup.getBounds().pad(0.2));
+                } else {
+                    self.map.setView(L.latLng(points[0]._latlng.lat, points[0]._latlng.lng), 13);
+                }
 
             };
 
-            var filters = self.filters;
-
             var embedLookup = new XMLHttpRequest();
-            embedLookup.open('GET', 'http://localhost:8000/api/1/events' + location.search);
+            embedLookup.open('GET', 'http://localhost:8000/api/1/events?' + self.filters);
             embedLookup.send(null);
             embedLookup.onreadystatechange = function(){
                 var DONE = 4, OK = 200;

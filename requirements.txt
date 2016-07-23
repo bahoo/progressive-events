@@ -9,6 +9,7 @@ dj-database-url==0.4.1
 Django==1.9.6
 django-annoying==0.9.0
 django-bootstrap3==7.0.1
+django-cors-headers==1.1.0
 django-dotenv==1.4.1
 django-dynamic-scraper==0.11.0
 django-eventtools==0.9.7

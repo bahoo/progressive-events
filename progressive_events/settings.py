@@ -45,12 +45,14 @@ INSTALLED_APPS = [
     'bootstrap3',
     'recurrence',
     'rest_framework',
+    'corsheaders',
     'core'
 ]
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -139,3 +141,6 @@ MESSAGE_TAGS = {
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
 }
+
+# may need addressing at some point, but until then...
+CORS_ORIGIN_ALLOW_ALL = True

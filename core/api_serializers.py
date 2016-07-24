@@ -24,6 +24,10 @@ class VenueSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     host = OrganizationSerializer()
     venue = VenueSerializer()
+    dates = serializers.SerializerMethodField()
+
+    def get_dates(self, obj):
+        return [d.date() for d in obj.dates(days=int(self.context['request'].GET.get('days', 60)))]
 
 
     class Meta:

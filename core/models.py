@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from localflavor.us.models import PhoneNumberField, USStateField, USZipCodeField
 from recurrence.fields import RecurrenceField
 
+from .fields import MoneypatchedRecurrenceField
 from .utils import get_point
 
 
@@ -71,11 +72,11 @@ class EventQueryset(models.query.GeoQuerySet):
     def filter_by_date(self, as_occurrences=False, **kwargs):
         future_date = datetime.now() + timedelta(**kwargs)
         queryset = self.all()
-        events = filter(lambda e: len(e.recurrences.between(datetime.now(), future_date)) > 0, queryset)
+        events = filter(lambda e: len(e.recurrences.between(datetime.now(), future_date, inc=True)) > 0, queryset)
         if as_occurrences:
             occurrences = []
             for e in events:
-                occurrences += e.recurrences.between(datetime.now(), future_date)
+                occurrences += e.recurrences.between(datetime.now(), future_date, inc=True)
             return occurrences
         else:
             return self.filter(pk__in=map(lambda e: e.pk, events))
@@ -100,7 +101,7 @@ class Event(models.Model):
     description = models.TextField(blank=True)
     start = models.TimeField(default=round_hours)
     end = models.TimeField(default=round_two_hours)
-    recurrences = RecurrenceField(null=True)
+    recurrences = MoneypatchedRecurrenceField(null=True)
     event_type = models.CharField(max_length=255, choices=EVENT_TYPE_CHOICES, null=True, blank=True)
     host = models.ForeignKey(Organization, blank=True, null=True)
     objects = EventQueryset.as_manager()
@@ -118,6 +119,7 @@ class Event(models.Model):
 
     def dates(self, *args, **kwargs):
         if not kwargs:
-            kwargs = {'days': 45}
-        future_date = datetime.now() + timedelta(**kwargs)
-        return self.recurrences.between(datetime.now(), future_date)
+            kwargs = {'days': 60}
+        today = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+        future_date = today + timedelta(**kwargs)
+        return [i for i in self.recurrences.between(after=today, before=future_date, inc=True)]

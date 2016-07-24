@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^api/1/orgs', api.OrganizationList.as_view()),
     url(r'^api/1/venues', api.VenueList.as_view()),
 
-    url(r'^(?P<slug>[\w\-]+)$', views.EventDetailView.as_view(), name='event_detail'),
+    url(r'^events/(?P<slug>[\w\-]+)$', views.EventDetailView.as_view(), name='event_detail'),
 
     url(r'^jsi18n/$', javascript_catalog, js_info_dict)
 ]

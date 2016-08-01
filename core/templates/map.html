@@ -92,7 +92,7 @@
                 {% if request.GET and events %}
                     <p class="text-center text-muted" style="margin: 2em 0"><span class="glyphicon glyphicon-pushpin"></span> Also, pro-tip &mdash; you can now <a href="#" onclick="event.preventDefault(); document.getElementById('embed').classList.remove('hidden');">embed these results on your site</a>!</p>
                     <div id="embed" class="hidden">
-                        <textarea class="form-control" readonly="readonly"><script src="http://{{ request.get_host }}{% static "js/embed.js" %}" id="progressive-events-embed" data-filters="{{ request.GET.urlencode }}"></script></textarea>
+                        <textarea class="form-control" readonly="readonly"><script src="http://{{ request.get_host }}{% static "js/embed.js" %}" data-filters="{{ request.GET.urlencode }}"></script></textarea>
                     </div>
                 {% endif %}
 

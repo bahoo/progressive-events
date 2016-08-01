@@ -1,10 +1,39 @@
-<!doctype html>
-<html>
-<head>
-</head>
-<body>
+{% extends "base.html" %}
 
-<script src="//localhost:8000/static/js/embed.js" id="progressive-events-embed" data-filters="event_types=party-event&amp;event_types=governing-body-event&amp;event_types=volunteer&amp;distance=15&amp;address=Seattle%2C+WA&amp;days=30"></script>
+{% load static %}
 
-</body>
-</html>
+{% block wrapped %}
+
+<h2>Embeddable Map Demos</h2>
+<p class="lead">Embeddable Maps are an easy way to drop events onto your web site.</p>
+
+<p>It uses <a href="http://leafletjs.com" target="_blank">LeafletJS</a> and intiializes its own dependencies. Just include a <code>&lt;script&gt;</code> tag, and you are off to the races!</p>
+
+<p><strong>Pro-tip:</strong> You can also perform any search on <a href="http://progressiveevents.org/">Progressive Events</a> and find an embeddable script tag beneath the search results.</p>
+
+<h3>Embed a Map:</h3>
+<p>Shows an embedded map of the default progressiveevents.org experience (which, selfishly, defaults to Seattle, WA).</p>
+<p><code>&lt;script src="{% static "js/embed.js" %}"&gt;&lt;/script&gt;</code></p>
+<script src="{% static "js/embed.js" %}"></script>
+
+<hr />
+
+<h3>Basic Search Parameters:</h3>
+<p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="event_types=party-event&amp;address=Seattle%2C+WA&amp;days=30"&gt;&lt;/script&gt;</code></p>
+<script src="{% static "js/embed.js" %}" data-filters="event_types=party-event&amp;address=Seattle%2C+WA&amp;days=30"></script>
+
+<hr />
+
+<h3>Organization Specific Maps:</h3>
+<p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="org=seattle-city-council"&gt;&lt;/script&gt;</code></p>
+<script src="{% static "js/embed.js" %}" data-filters="org=seattle-city-council"></script>
+
+<hr />
+
+<h3>Specific Event Maps:</h3>
+<p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="event=west-seattle-bike-connections-monthly-meeting"&gt;&lt;/script&gt;</code></p>
+<script src="{% static "js/embed.js" %}" data-filters="event=west-seattle-bike-connections-monthly-meeting"></script>
+
+<hr />
+
+{% endblock %}

@@ -3,6 +3,9 @@ var progressive_events_embed = (function(){
     var self = {
 
         init: function(){
+
+            self.scriptTag = document.currentScript;
+
             self.initAssets(function(){
                 self.initMap();
                 self.loadEvents();
@@ -13,30 +16,60 @@ var progressive_events_embed = (function(){
 
         initAssets: function(callback){
             var head = document.querySelector('head');
+            var body = document.querySelector('body');
 
-            // add leaflet css and js
-            var leafletCss = document.createElement('link');
-            leafletCss.rel = 'stylesheet';
-            leafletCss.href = 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css'
-            head.appendChild(leafletCss);
+            if(!body.dataset.progressiveEventsEmbedInitialized){
 
-            var leafletJS = document.createElement('script');
-            leafletJS.type = 'text/javascript';
-            leafletJS.src = 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js';
-            head.appendChild(leafletJS);
+                // add leaflet css and js
+                var leafletCss = document.createElement('link');
+                leafletCss.rel = 'stylesheet';
+                leafletCss.href = 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css'
+                head.appendChild(leafletCss);
 
-            leafletJS.onload = callback;
+                var leafletJS = document.createElement('script');
+                leafletJS.type = 'text/javascript';
+                leafletJS.src = 'http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js';
+                leafletJS.setAttribute('id', 'leaflet-js');
+                head.appendChild(leafletJS);
+
+                body.dataset.progressiveEventsEmbedInitialized = "true";
+            
+            } else {
+
+                leafletJS = document.getElementById('leaflet-js');
+
+            }
+
+            var oldOnload = leafletJS.onload;
+
+            leafletJS.onload = function(){
+                if(oldOnload){
+                    oldOnload();
+                }
+                callback();
+            }
+        },
+
+        createId: function(filters){
+
+            var base = 'progressive-events-map';
+            if(filters){
+                return base + '-' + filters.replace(/\W+/, '-');
+            }
+
+            return base;
+
         },
 
         initMap: function(){
-
-            self.scriptTag = document.getElementById('progressive-events-embed');
 
             self.filters = self.scriptTag.dataset.filters;
 
             // init map.
             self.mapElement = document.createElement('div');
-            self.mapElement.setAttribute('id', 'progressive-events-map');
+
+            var mapId = self.createId(self.filters);
+            self.mapElement.setAttribute('id', mapId);
 
             // arbitrary
             self.mapElement.style = 'min-height: 300px; width: 100%;';
@@ -79,7 +112,8 @@ var progressive_events_embed = (function(){
                     var event = events[i];
 
                     points.push(L.marker([event.venue.point.y, event.venue.point.x])
-                            // todo: need some way to 
+                            // todo: need some way to decouple this better.
+                            // could be passed in as a data-* attribute, maybe?
                             .bindPopup(`<h4>${event.title}</h4>
                                         <p><a href="https://www.google.com/maps/place/${encodeURIComponent(event.venue.address)}%2C+${encodeURIComponent(event.venue.city)}%2C+${encodeURIComponent(event.venue.state)}+${encodeURIComponent(event.venue.zipcode)}" target="_blank"><b>${event.venue.title}</b><br /><span class="text-muted">${event.venue.address}, ${event.venue.city}</span></a></p>
                                         <p>${event.description}</p>

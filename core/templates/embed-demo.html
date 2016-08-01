@@ -19,18 +19,22 @@
 <hr />
 
 <h3>Basic Search Parameters:</h3>
+<p>You can find the search params format by doing a search on the home page &mdash; just copy the query string.</p>
 <p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="event_types=party-event&amp;address=Seattle%2C+WA&amp;days=30"&gt;&lt;/script&gt;</code></p>
 <script src="{% static "js/embed.js" %}" data-filters="event_types=party-event&amp;address=Seattle%2C+WA&amp;days=30"></script>
 
 <hr />
 
 <h3>Organization Specific Maps:</h3>
+<p>Organization slugs aren't currently surfaced in the front-end PE experience, but they're findable in the <a href="http://www.progressiveevents.org/api/1/orgs">REST API</a> or easy enough to deduce.</p>
+<p>Note: absent any other search filters, it will try and show ALL upcoming for that organization (with a default search window of 30 days).</p>
 <p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="org=seattle-city-council"&gt;&lt;/script&gt;</code></p>
 <script src="{% static "js/embed.js" %}" data-filters="org=seattle-city-council"></script>
 
 <hr />
 
 <h3>Specific Event Maps:</h3>
+<p>If you click through to <a href="/events/seattle-city-council">an event detail page</a>, you can snag it's slug from the URL, and use it in the <code>event=</code> parameter in the <code>data-filters</code> attribute.</p>
 <p><code>&lt;script src="{% static "js/embed.js" %}" data-filters="event=west-seattle-bike-connections-monthly-meeting"&gt;&lt;/script&gt;</code></p>
 <script src="{% static "js/embed.js" %}" data-filters="event=west-seattle-bike-connections-monthly-meeting"></script>
 

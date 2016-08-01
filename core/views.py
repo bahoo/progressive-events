@@ -39,8 +39,8 @@ class EmbedView(TemplateView):
     template_name = 'embed.html'
 
 
-class EmbedTestView(TemplateView):
-    template_name = 'embed-test.html'
+class EmbedDemoView(TemplateView):
+    template_name = 'embed-demo.html'
 
 
 class AddView(TemplateView):

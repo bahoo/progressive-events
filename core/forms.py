@@ -46,6 +46,7 @@ class VenueForm(forms.ModelForm):
 
 
 class OrganizationForm(forms.ModelForm):
+    organization_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Organization

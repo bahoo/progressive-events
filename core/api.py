@@ -83,10 +83,21 @@ class EventList(generics.ListAPIView):
     filter_fields = ['event', 'event_type', 'org']
 
 
+class OrganizationFilter(filters.FilterSet):
+    search = django_filters.CharFilter(name='title', lookup_expr='icontains')
+
+    class Meta:
+        model = Organization
+        fields = ['search']
+
+
 class OrganizationList(generics.ListAPIView):
+    search = django_filters.CharFilter(name='title', lookup_expr='icontains')
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = OrganizationFilter
+    filter_fields = ['search']
 
 
 class VenueFilter(filters.FilterSet):

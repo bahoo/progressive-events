@@ -6,7 +6,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organization
-        exclude = ['id']
+        exclude = []
 
 
 class VenueSerializer(serializers.ModelSerializer):

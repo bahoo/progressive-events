@@ -1,18 +1,16 @@
 var sigo = function(){
 
-    var self = {
+    function sigo(input, endpoint, destination, form, template){
 
-        init: function(input, endpoint, destination, form, template){
-            self.input = input;
-            self.endpoint = endpoint;
-            self.destination = destination;
-            self.form = form;
-            self.template = template;
-            self.bind();
-            self.hideAndDisableForm();
-        },
+        var self = this;
 
-        utils: {
+        self.input = input;
+        self.endpoint = endpoint;
+        self.destination = destination;
+        self.form = form;
+        self.template = template;
+
+        self.utils = {
 
             getElementPosition: function (field){
                 var offsetLeft = 0;
@@ -29,9 +27,9 @@ var sigo = function(){
                 };
             }
 
-        },
+        };
 
-        getElementById: function(elem){
+        self.getElementById = function(elem){
 
             if(typeof elem == 'object'){
                 return elem;
@@ -39,9 +37,9 @@ var sigo = function(){
                 return document.getElementById(elem);
             }
 
-        },
+        };
 
-        bind: function(){
+        self.bind = function(){
 
             self.getElementById(self.input).addEventListener('keyup', self.handleInputKeyup);
             document.addEventListener('click', self.handleAutocompleteItemClick);
@@ -49,17 +47,17 @@ var sigo = function(){
             // being nice.
             self.getElementById(self.input).setAttribute('autocomplete', 'off');
 
-        },
+        };
 
 
-        unbind: function(){
+        self.unbind = function(){
+            //
+        };
 
-        },
-
-        handleAutocompleteItemClick: function(e){
+        self.handleAutocompleteItemClick = function(e){
 
             var autocomplete = e.target.closest('.autocomplete-list');
-            if(!autocomplete){
+            if(!autocomplete || autocomplete.getAttribute('id') != 'autocomplete-' + self.input){
                 return true;
             }
 
@@ -74,9 +72,9 @@ var sigo = function(){
 
             self.hideAutocompleteWidget();
 
-        },
+        };
 
-        handleInputKeyup: function(e){
+        self.handleInputKeyup = function(e){
 
             clearTimeout(self.handleLookupTimeout);
 
@@ -107,36 +105,36 @@ var sigo = function(){
                 
             }, 400);
 
-        },
+        };
 
-        showAndEnableForm: function(){
+        self.showAndEnableForm = function(){
             var form = self.getElementById(self.form);
             form.classList.remove('hidden');
             var elements = form.querySelectorAll('input, select');
             for(var i = 0; i < elements.length; i++){
                 elements[i].removeAttribute('disabled');
             }
-        },
+        };
 
-        hideAndDisableForm: function(){
+        self.hideAndDisableForm = function(){
             var form = self.getElementById(self.form);
             form.classList.add('hidden');
             var elements = form.querySelectorAll('input, select');
             for(var i = 0; i < elements.length; i++){
                 elements[i].setAttribute('disabled', 'disabled');
             }
-        },
+        };
 
-        hideAutocompleteWidget: function(){
+        self.hideAutocompleteWidget = function(){
 
             var autocomplete = document.getElementById('autocomplete-' + self.input);
             if(autocomplete){
                 autocomplete.parentNode.removeChild(autocomplete);
             }
 
-        },
+        };
 
-        initWidget : function(response){
+        self.initWidget = function(response){
 
             self.hideAutocompleteWidget();
 
@@ -160,10 +158,15 @@ var sigo = function(){
             list.style.top = fieldPosition.top + self.getElementById(self.input).offsetHeight + 5 + 'px';
 
             document.getElementsByTagName('body')[0].appendChild(list);
-        }
+        };
+
+        self.bind();
+        self.hideAndDisableForm();
+        
+        return self;
 
     };
 
-    return self;
+    return sigo;
 
 }();

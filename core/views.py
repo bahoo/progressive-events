@@ -8,7 +8,7 @@ from django.views.generic import DetailView, TemplateView
 
 from .api import EventFilterBackend
 from .forms import VenueForm, OrganizationForm, EventForm
-from .models import Event, Venue
+from .models import Event, Organization, Venue
 
 
 class EventDetailView(DetailView):
@@ -53,12 +53,18 @@ class AddView(TemplateView):
 
         if (venue_form.data['venue-venue_id'] or venue_form.is_valid()) and \
                 event_form.is_valid() and \
-                organization_form.is_valid():
-            organization = organization_form.save()
+                (organization_form.data['organization-organization_id'] or organization_form.is_valid()):
+
             if venue_form.data['venue-venue_id']:
                 venue = Venue.objects.get(pk=int(venue_form.data['venue-venue_id']))
             else:
                 venue = venue_form.save()
+
+            if organization_form.data['organization-organization_id']:
+                organization = Organization.objects.get(pk=int(organization_form.data['organization-organization_id']))
+            else:
+                organization = organization_form.save()
+
             event = event_form.save(commit=False)
             event.host = organization
             event.venue = venue

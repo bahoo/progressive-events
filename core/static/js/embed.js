@@ -72,7 +72,7 @@ var progressive_events_embed = (function(){
             self.mapElement.setAttribute('id', mapId);
 
             // arbitrary
-            self.mapElement.style = 'min-height: 300px; width: 100%;';
+            self.mapElement.setAttribute('style', 'min-height: 300px; width: 100%;');
 
             self.scriptTag.parentNode.insertBefore(self.mapElement, self.scriptTag.nextSibling);
 

@@ -37,10 +37,10 @@ class Venue(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             candidate_slug = slugify(self.title)[0:255]
-            if self.model.objects.filter(slug=candidate_slug).exists():
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
                 candidate_slug_counter = 1
                 while True:
-                    if not self.model.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
                         break
                     candidate_slug_counter += 1
 
@@ -72,10 +72,10 @@ class Organization(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             candidate_slug = slugify(self.title)[0:255]
-            if self.model.objects.filter(slug=candidate_slug).exists():
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
                 candidate_slug_counter = 1
                 while True:
-                    if not self.model.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
                         break
                     candidate_slug_counter += 1
 
@@ -131,10 +131,10 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             candidate_slug = slugify(self.title)[0:255]
-            if self.model.objects.filter(slug=candidate_slug).exists():
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
                 candidate_slug_counter = 1
                 while True:
-                    if not self.model.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
                         break
                     candidate_slug_counter += 1
 

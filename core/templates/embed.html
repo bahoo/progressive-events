@@ -59,7 +59,7 @@
 
 
     var embedLookup = new XMLHttpRequest();
-    embedLookup.open('GET', 'http://localhost:8000/api/1/events' + location.search);
+    embedLookup.open('GET', '/api/1/events' + location.search);
     embedLookup.send(null);
     embedLookup.onreadystatechange = function(){
         var DONE = 4, OK = 200;

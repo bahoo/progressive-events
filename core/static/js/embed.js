@@ -113,11 +113,32 @@ var progressive_events_embed = (function(){
                 distanceLabel.innerHTML = "Distance:";
                 self.distanceField = document.createElement('select');
                 self.distanceField.setAttribute('style', 'margin-left: 1em;')
-                var distances = ['5', '10', '20', '50'];
+
+                var distances = [5, 10, 20, 50];                
+                var setDistance = self.filters.match(/distance=(\d+)/i);
+                if(setDistance){
+                    setDistance = parseInt(setDistance[1]);
+                } else {
+                    setDistance = 20;
+                }
+                
+                if(distances.indexOf(setDistance) == -1){
+                    distances.push(setDistance);
+                }
+
+                var compareIntegers = function(a, b){
+                    return a-b;
+                }
+
+                distances = distances.sort(compareIntegers);
+
                 for(var d in distances){
                     var elem = document.createElement('option')
                     elem.innerHTML = `${distances[d]} miles`;
                     elem.setAttribute('value', distances[d]);
+                    if(distances[d] == setDistance){
+                        elem.setAttribute('selected', 'selected');
+                    }
                     self.distanceField.appendChild(elem);
                 }
 

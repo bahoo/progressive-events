@@ -18,7 +18,7 @@ class EventFilterBackend(filters.BaseFilterBackend):
 
     def prepare_search_form(self, request):
 
-        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30', 'event_types': list(k for (k, v) in Event.EVENT_TYPE_CHOICES)}
+        initial_data = {'address': 'Seattle, WA', 'distance': '20', 'days': '30', 'event_types': list(k for (k, v) in Event.EVENT_TYPE_CHOICES)}
 
         for k, v in initial_data.iteritems():
             if request.GET.get(k, None):

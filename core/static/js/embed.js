@@ -88,7 +88,10 @@ var progressive_events_embed = (function(){
             self.showSearch = self.scriptTag.dataset.search;
 
             if(self.showSearch){
+
                 searchWrapper = document.createElement('div');
+
+                // zip code filter
                 searchLabel = document.createElement('label');
                 searchLabel.innerHTML = "Filter Events by Zip Code:";
                 self.searchField = document.createElement('input');
@@ -104,7 +107,35 @@ var progressive_events_embed = (function(){
                 // should be bound somewhere separately, but...
                 self.searchField.addEventListener('keyup', self.handleZipSearch);
 
+                // distance filter
+                distanceLabel = document.createElement('label');
+                distanceLabel.setAttribute('style', 'margin-left: 1em;')
+                distanceLabel.innerHTML = "Distance:";
+                self.distanceField = document.createElement('select');
+                self.distanceField.setAttribute('style', 'margin-left: 1em;')
+                var distances = ['5', '10', '20', '50'];
+                for(var d in distances){
+                    var elem = document.createElement('option')
+                    elem.innerHTML = `${distances[d]} miles`;
+                    elem.setAttribute('value', distances[d]);
+                    self.distanceField.appendChild(elem);
+                }
+
+                distanceLabel.appendChild(self.distanceField);
+                searchWrapper.appendChild(distanceLabel);
+
+                // todo: set events
+                self.distanceField.addEventListener('input', self.handleDistanceChange)
+
             }
+
+        },
+
+        handleDistanceChange: function(){
+
+            self.filters = (self.filters.replace(/distance=[^&]+/gi, "") + "&distance=" + self.distanceField.options[self.distanceField.selectedIndex].value).replace(/&+/g, '&');
+            self.clearEvents();
+            self.loadEvents();
 
         },
 
@@ -121,8 +152,8 @@ var progressive_events_embed = (function(){
                     if(e.which == 13 && e.target.value.length == 0){
                         self.filters = self.scriptTag.dataset.filters;
                     } else {
-                        self.filters = (self.filters.replace(/address=[^&]+/, "") + "&address=" + e.target.value).replace(/&+/g, '&');
-                        self.filters = (self.filters.replace(/distance=[^&]+/, "") + "&distance=" + 5).replace(/&+/g, '&');
+                        self.filters = (self.filters.replace(/address=[^&]+/gi, "") + "&address=" + e.target.value).replace(/&+/g, '&');
+                        self.filters = (self.filters.replace(/distance=[^&]+/gi, "") + "&distance=" + self.distanceField.options[self.distanceField.selectedIndex].value).replace(/&+/g, '&');
                     }
                     self.clearEvents();
                     self.loadEvents();

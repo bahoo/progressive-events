@@ -54,7 +54,7 @@ var progressive_events_embed = (function(){
 
             var base = 'progressive-events-map';
             if(filters){
-                return base + '-' + filters.replace(/\W+/, '-');
+                return base + '-' + filters.replace(/\W+/g, '-');
             }
 
             return base;
@@ -68,8 +68,8 @@ var progressive_events_embed = (function(){
             // init map.
             self.mapElement = document.createElement('div');
 
-            var mapId = self.createId(self.filters);
-            self.mapElement.setAttribute('id', mapId);
+            self.mapId = self.createId(self.filters);
+            self.mapElement.setAttribute('id', self.mapId);
 
             // arbitrary
             self.mapElement.setAttribute('style', 'min-height: 300px; width: 100%;');
@@ -86,69 +86,88 @@ var progressive_events_embed = (function(){
 
             // add zip code search field?
             self.showSearch = self.scriptTag.dataset.search;
-
             if(self.showSearch){
-
-                searchWrapper = document.createElement('div');
-
-                // zip code filter
-                searchLabel = document.createElement('label');
-                searchLabel.innerHTML = "Filter Events by Zip Code:";
-                self.searchField = document.createElement('input');
-                self.searchField.setAttribute('placeholder', '90210');
-                self.searchField.setAttribute('size', '5');
-                self.searchField.setAttribute('style', 'margin-left: 0.5em; text-align: center; padding: 0 0.5em;');
-
-                searchLabel.appendChild(self.searchField);
-                searchWrapper.appendChild(searchLabel);
-
-                self.scriptTag.parentNode.insertBefore(searchWrapper, self.scriptTag.nextSibling);
-
-                // should be bound somewhere separately, but...
-                self.searchField.addEventListener('keyup', self.handleZipSearch);
-
-                // distance filter
-                distanceLabel = document.createElement('label');
-                distanceLabel.setAttribute('style', 'margin-left: 1em;')
-                distanceLabel.innerHTML = "Distance:";
-                self.distanceField = document.createElement('select');
-                self.distanceField.setAttribute('style', 'margin-left: 1em;')
-
-                var distances = [5, 10, 20, 50];                
-                var setDistance = self.filters.match(/distance=(\d+)/i);
-                if(setDistance){
-                    setDistance = parseInt(setDistance[1]);
-                } else {
-                    setDistance = 20;
-                }
-                
-                if(distances.indexOf(setDistance) == -1){
-                    distances.push(setDistance);
-                }
-
-                var compareIntegers = function(a, b){
-                    return a-b;
-                }
-
-                distances = distances.sort(compareIntegers);
-
-                for(var d in distances){
-                    var elem = document.createElement('option')
-                    elem.innerHTML = `${distances[d]} miles`;
-                    elem.setAttribute('value', distances[d]);
-                    if(distances[d] == setDistance){
-                        elem.setAttribute('selected', 'selected');
-                    }
-                    self.distanceField.appendChild(elem);
-                }
-
-                distanceLabel.appendChild(self.distanceField);
-                searchWrapper.appendChild(distanceLabel);
-
-                // todo: set events
-                self.distanceField.addEventListener('input', self.handleDistanceChange)
-
+                self.addZipSearch();
             }
+
+
+            // show list itself?
+            self.showList = self.scriptTag.dataset.showlist;
+            if(self.showList){
+                self.addList();
+            }
+
+        },
+
+        addZipSearch: function(){
+
+            searchWrapper = document.createElement('div');
+
+            // zip code filter
+            searchLabel = document.createElement('label');
+            searchLabel.innerHTML = "Filter Events by Zip Code:";
+            self.searchField = document.createElement('input');
+            self.searchField.setAttribute('placeholder', '90210');
+            self.searchField.setAttribute('size', '5');
+            self.searchField.setAttribute('style', 'margin-left: 0.5em; text-align: center; padding: 0 0.5em;');
+
+            searchLabel.appendChild(self.searchField);
+            searchWrapper.appendChild(searchLabel);
+
+            self.scriptTag.parentNode.insertBefore(searchWrapper, self.scriptTag.nextSibling);
+
+            // should be bound somewhere separately, but...
+            self.searchField.addEventListener('keyup', self.handleZipSearch);
+
+            // distance filter
+            distanceLabel = document.createElement('label');
+            distanceLabel.setAttribute('style', 'margin-left: 1em;')
+            distanceLabel.innerHTML = "Distance:";
+            self.distanceField = document.createElement('select');
+            self.distanceField.setAttribute('style', 'margin-left: 1em;')
+
+            var distances = [5, 10, 20, 50];                
+            var setDistance = self.filters.match(/distance=(\d+)/i);
+            if(setDistance){
+                setDistance = parseInt(setDistance[1]);
+            } else {
+                setDistance = 20;
+            }
+            
+            if(distances.indexOf(setDistance) == -1){
+                distances.push(setDistance);
+            }
+
+            var compareIntegers = function(a, b){
+                return a-b;
+            }
+
+            distances = distances.sort(compareIntegers);
+
+            for(var d in distances){
+                var elem = document.createElement('option')
+                elem.innerHTML = `${distances[d]} miles`;
+                elem.setAttribute('value', distances[d]);
+                if(distances[d] == setDistance){
+                    elem.setAttribute('selected', 'selected');
+                }
+                self.distanceField.appendChild(elem);
+            }
+
+            distanceLabel.appendChild(self.distanceField);
+            searchWrapper.appendChild(distanceLabel);
+
+            // todo: set events
+            self.distanceField.addEventListener('input', self.handleDistanceChange)
+        },
+
+
+        addList: function(){
+
+            self.eventsList = document.createElement('div');
+            self.eventsList.setAttribute('id', self.mapId + '-list');
+
+            self.scriptTag.parentNode.insertBefore(self.eventsList, self.map.nextSibling);
 
         },
 
@@ -202,35 +221,63 @@ var progressive_events_embed = (function(){
             self.map.removeLayer(self.markerGroup);
         },
 
-        loadEvents: function(){
+        populatePoints: function(events){
 
             var points = [];
 
-            var populatePoints = function(events){
+            for(var i = 0; i < events.length; i++){
 
-                for(var i = 0; i < events.length; i++){
+                var event = events[i];
 
-                    var event = events[i];
+                points.push(L.marker([event.venue.point.y, event.venue.point.x])
+                        // todo: need some way to decouple this better.
+                        // could be passed in as a data-* attribute, maybe?
+                        .bindPopup(`<h4>${event.title}</h4>
+                                    <p><a href="https://www.google.com/maps/place/${encodeURIComponent(event.venue.address)}%2C+${encodeURIComponent(event.venue.city)}%2C+${encodeURIComponent(event.venue.state)}+${encodeURIComponent(event.venue.zipcode)}" target="_blank"><b>${event.venue.title}</b><br /><span class="text-muted">${event.venue.address}, ${event.venue.city}</span></a></p>
+                                    <p>${event.description}</p>
+                                    <p><a href="${event.url}" target="_blank">${event.url}</a></p>`));
 
-                    points.push(L.marker([event.venue.point.y, event.venue.point.x])
-                            // todo: need some way to decouple this better.
-                            // could be passed in as a data-* attribute, maybe?
-                            .bindPopup(`<h4>${event.title}</h4>
-                                        <p><a href="https://www.google.com/maps/place/${encodeURIComponent(event.venue.address)}%2C+${encodeURIComponent(event.venue.city)}%2C+${encodeURIComponent(event.venue.state)}+${encodeURIComponent(event.venue.zipcode)}" target="_blank"><b>${event.venue.title}</b><br /><span class="text-muted">${event.venue.address}, ${event.venue.city}</span></a></p>
-                                        <p>${event.description}</p>
-                                        <p><a href="${event.url}" target="_blank">${event.url}</a></p>`));
+            }
 
+            self.markerGroup = L.featureGroup(points);
+            self.markerGroup.addTo(self.map);
+            if(points.length > 1){
+                self.map.fitBounds(self.markerGroup.getBounds().pad(0.2));
+            } else {
+                self.map.setView(L.latLng(points[0]._latlng.lat, points[0]._latlng.lng), 13);
+            }
+
+        },
+
+        populateList: function(events){
+
+            var fetchList = new XMLHttpRequest();
+            // todo: better suss out environments
+            fetchList.open('GET', 'http://www.progressiveevents.org/?' + self.filters);
+            fetchList.send(null);
+            fetchList.onreadystatechange = function(){
+                var DONE = 4, OK = 200;
+                if(fetchList.readyState == DONE && fetchList.status == OK){
+                    var context = document.implementation.createHTMLDocument("");
+                    // sooooo gross. so, so, so gross.
+                    var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
+                    var baseTag = document.createElement('base');
+                    context.querySelector('body').innerHTML = pattern.exec(fetchList.responseText)[1];
+
+                    var relativeLinks = context.querySelectorAll('.event-items a[href^="/"]');
+                    for(var a = 0; a < relativeLinks.length; a++){
+                        relativeLinks[a].setAttribute('href', 'http://www.progressiveevents.org' + relativeLinks[a].getAttribute('href'));
+                    }
+
+                    self.eventsList.innerHTML = context.querySelector('.event-items').innerHTML;
                 }
+            }
 
-                self.markerGroup = L.featureGroup(points);
-                self.markerGroup.addTo(self.map);
-                if(points.length > 1){
-                    self.map.fitBounds(self.markerGroup.getBounds().pad(0.2));
-                } else {
-                    self.map.setView(L.latLng(points[0]._latlng.lat, points[0]._latlng.lng), 13);
-                }
+            
 
-            };
+        },
+
+        loadEvents: function(){
 
             var embedLookup = new XMLHttpRequest();
             // todo: better suss out environments
@@ -241,7 +288,10 @@ var progressive_events_embed = (function(){
                 if(embedLookup.readyState == DONE && embedLookup.status == OK){
                     var response = JSON.parse(embedLookup.responseText);
                     if(response.length){
-                        populatePoints(response);
+                        self.populatePoints(response);
+                        if(self.showList){
+                            self.populateList(response)
+                        }
                     }
                 }
             }

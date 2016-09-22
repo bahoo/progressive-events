@@ -121,8 +121,8 @@ var progressive_events_embed = (function(){
                     if(e.which == 13 && e.target.value.length == 0){
                         self.filters = self.scriptTag.dataset.filters;
                     } else {
-                        self.filters = (self.filters.replace(/address=[^&]+/, "") + "&address=" + e.target.value).replace(/&+/, '&');
-                        self.filters = (self.filters.replace(/distance=[^&]+/, "") + "&distance=" + 5).replace(/&+/, '&');
+                        self.filters = (self.filters.replace(/address=[^&]+/, "") + "&address=" + e.target.value).replace(/&+/g, '&');
+                        self.filters = (self.filters.replace(/distance=[^&]+/, "") + "&distance=" + 5).replace(/&+/g, '&');
                     }
                     self.clearEvents();
                     self.loadEvents();

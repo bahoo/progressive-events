@@ -24,70 +24,73 @@
                 
                 {% include "search-form.html" %}
 
-                {% for event in events %}
-                    <div class="event-item row" id="{{ event.title | slugify }}-{{ event.pk }}">
-                        <div class="col-sm-7">
-                            <h4>
-                                {{ event.title }}
-                                {% if event.host %}<span class="small">&ndash; hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</span>{% endif %}
-                            </h4>
-                            
-                            {% if event.description %}
-                                <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | linebreaksbr | urlize }}</p>
-                            {% endif %}
-                            
-                            {% if event.venue.address %}
-                                <p><span class="glyphicon glyphicon-map-marker text-muted" style="margin-right: 0.33em;"></span><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a></p>
-                            {% endif %}
-                            
+                <div class="event-items">
 
-                            
-                            <p><span class="glyphicon glyphicon-link text-muted"></span> <a href="{{ event.get_absolute_url }}">Details</a>{% if event.url %} | More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a>{% endif %}</p>
-                            
-                        </div>
+                    {% for event in events %}
+                        <div class="event-item row" id="{{ event.title | slugify }}-{{ event.pk }}">
+                            <div class="col-sm-7">
+                                <h4>
+                                    {{ event.title }}
+                                    {% if event.host %}<span class="small">&ndash; hosted by {% if event.host.url %}<a href="{{ event.host.url }}" target="_blank">{% endif %}{{ event.host.title }}{% if event.host.url %}</a>{% endif %}</span>{% endif %}
+                                </h4>
+                                
+                                {% if event.description %}
+                                    <p style="margin: 0 1.33em 10px"><span class="glyphicon glyphicon-info-sign text-muted" style="margin-left: -1.33em; margin-right: 0.33em;"></span>{{ event.description | linebreaksbr | urlize }}</p>
+                                {% endif %}
+                                
+                                {% if event.venue.address %}
+                                    <p><span class="glyphicon glyphicon-map-marker text-muted" style="margin-right: 0.33em;"></span><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a></p>
+                                {% endif %}
+                                
 
-                        <div class="col-sm-5 event-sidebar">
-                            {% event_dates event days=search_form.days.value as dates %}
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-calendar"></span>
-                                        {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
-                                    <p>
-                                        {% for date in dates|slice:"0:3" %}
-                                            {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}
-                                        {% endfor %}
-                                    </p>
-                                </div>
+                                
+                                <p><span class="glyphicon glyphicon-link text-muted"></span> <a href="{{ event.get_absolute_url }}">Details</a>{% if event.url %} | More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a>{% endif %}</p>
+                                
                             </div>
-                            {% if event.start %}
+
+                            <div class="col-sm-5 event-sidebar">
+                                {% event_dates event days=search_form.days.value as dates %}
                                 <div class="row">
                                     <div class="col-xs-12">
-                                        <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-time"></span> Time:</h5>
-                                        <p>{{ event.start }} {% if event.end %}&ndash; {{ event.end }}{% endif %}</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            {% if event.recurrences.rrules %}
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-repeat"></span> Schedule:</h5>
-                                        <ul class="list-unstyled">
-                                            {% for rule in event.recurrences.rrules %}
-                                                <li>{{ rule.to_text | title }}</li>
+                                        <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-calendar"></span>
+                                            {% if event.recurrences.rrules|length > 0 %}Upcoming Dates{% else %}Event Date{% endif %}:</h5>
+                                        <p>
+                                            {% for date in dates|slice:"0:3" %}
+                                                {{ date|date:"F jS" }}{% if not forloop.last %},{% endif %}
                                             {% endfor %}
-                                        </ul>
+                                        </p>
                                     </div>
                                 </div>
-                            {% endif %}
+                                {% if event.start %}
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-time"></span> Time:</h5>
+                                            <p>{{ event.start }} {% if event.end %}&ndash; {{ event.end }}{% endif %}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if event.recurrences.rrules %}
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-repeat"></span> Schedule:</h5>
+                                            <ul class="list-unstyled">
+                                                {% for rule in event.recurrences.rrules %}
+                                                    <li>{{ rule.to_text | title }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
 
-                {% empty %}
-                    <div class="event-item text-center" style="padding: 4em 0">
-                        <h4>No events matching that search.</h4>
-                    </div>
-                {% endfor %}
+                    {% empty %}
+                        <div class="event-item text-center" style="padding: 4em 0">
+                            <h4>No events matching that search.</h4>
+                        </div>
+                    {% endfor %}
 
+                </div>
 
                 {% if request.GET and events %}
                     <p class="text-center text-muted" style="margin: 2em 0"><span class="glyphicon glyphicon-pushpin"></span> Also, pro-tip &mdash; you can now <a href="#" onclick="event.preventDefault(); document.getElementById('embed').classList.remove('hidden');">embed these results on your site</a>!</p>

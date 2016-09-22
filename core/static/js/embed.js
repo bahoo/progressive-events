@@ -84,6 +84,51 @@ var progressive_events_embed = (function(){
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(self.map);
 
+            // add zip code search field?
+            self.showSearch = self.scriptTag.dataset.search;
+
+            if(self.showSearch){
+                searchWrapper = document.createElement('div');
+                searchLabel = document.createElement('label');
+                searchLabel.innerHTML = "Filter Events by Zip Code:";
+                self.searchField = document.createElement('input');
+                self.searchField.setAttribute('placeholder', '90210');
+                self.searchField.setAttribute('size', '5');
+                self.searchField.setAttribute('style', 'margin-left: 0.5em; text-align: center; padding: 0 0.5em;');
+
+                searchLabel.appendChild(self.searchField);
+                searchWrapper.appendChild(searchLabel);
+
+                self.scriptTag.parentNode.insertBefore(searchWrapper, self.scriptTag.nextSibling);
+
+                // should be bound somewhere separately, but...
+                self.searchField.addEventListener('keyup', self.handleZipSearch);
+
+            }
+
+        },
+
+        handleZipSearch: function(e){
+
+            if(typeof self.clearEventsTimeout !== 'undefined'){
+                clearTimeout(self.clearEventsTimeout);
+            }
+
+            if(e.which == 13 || e.target.value.length >= 5){
+
+                self.clearEventsTimeout = setTimeout(function(){
+
+                    if(e.which == 13 && e.target.value.length == 0){
+                        self.filters = self.scriptTag.dataset.filters;
+                    } else {
+                        self.filters = (self.filters.replace(/address=[^&]+/, "") + "&address=" + e.target.value).replace(/&+/, '&');
+                        self.filters = (self.filters.replace(/distance=[^&]+/, "") + "&distance=" + 5).replace(/&+/, '&');
+                    }
+                    self.clearEvents();
+                    self.loadEvents();
+                }, 300);
+            }
+
         },
 
         queryfyJSON: function(blob){
@@ -99,6 +144,10 @@ var progressive_events_embed = (function(){
                             encodeURIComponent(blob[key]);
                     }).join('&');
 
+        },
+
+        clearEvents: function(){
+            self.map.removeLayer(self.markerGroup);
         },
 
         loadEvents: function(){
@@ -121,10 +170,10 @@ var progressive_events_embed = (function(){
 
                 }
 
-                var markerGroup = L.featureGroup(points);
-                markerGroup.addTo(self.map);
+                self.markerGroup = L.featureGroup(points);
+                self.markerGroup.addTo(self.map);
                 if(points.length > 1){
-                    self.map.fitBounds(markerGroup.getBounds().pad(0.2));
+                    self.map.fitBounds(self.markerGroup.getBounds().pad(0.2));
                 } else {
                     self.map.setView(L.latLng(points[0]._latlng.lat, points[0]._latlng.lng), 13);
                 }

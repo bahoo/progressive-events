@@ -282,6 +282,7 @@ var progressive_events_embed = (function(){
             var embedLookup = new XMLHttpRequest();
             // todo: better suss out environments
             embedLookup.open('GET', 'http://www.progressiveevents.org/api/1/events?' + self.filters);
+            embedLookup.setRequestHeader('Accept', 'application/json');
             embedLookup.send(null);
             embedLookup.onreadystatechange = function(){
                 var DONE = 4, OK = 200;

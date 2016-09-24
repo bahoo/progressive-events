@@ -24,7 +24,7 @@ class MapView(TemplateView):
 
         event_filter_backend = EventFilterBackend()
         search_form = event_filter_backend.prepare_search_form(request=self.request)
-        point = event_filter_backend.get_point(search_form['address'].value)
+        point = event_filter_backend.get_point(search_form.data['address'])
         context['events'] = event_filter_backend.filter_queryset(request=self.request, queryset=Event.objects.all(), view=self, search_form=search_form, point=point)
         
         context['now'] = datetime.now()

@@ -23,7 +23,9 @@ class EventFilterBackend(filters.BaseFilterBackend):
         for k, v in initial_data.iteritems():
             if request.GET.get(k, None):
                 if k == 'event_types':
-                    initial_data[k] = request.GET.getlist(k)
+                    event_type_list = [None if e == u'None' else e for e in request.GET.getlist(k)]
+                    if event_type_list and event_type_list != ['any'] and set(event_type_list) != set(map(lambda t: t[0], Event.EVENT_TYPE_CHOICES)):
+                        initial_data[k] = event_type_list
                 else:
                     initial_data[k] = request.GET.get(k)
 
@@ -44,8 +46,8 @@ class EventFilterBackend(filters.BaseFilterBackend):
         if not search_form:
             search_form = self.prepare_search_form(request)
 
-        if not point and search_form['address'].value():
-            point = self.get_point(search_form['address'].value())
+        if not point and 'address' in search_form.data:
+            point = self.get_point(search_form.data['address'])
 
         event_type_filter = Q()
         for event_type in search_form.data['event_types']:

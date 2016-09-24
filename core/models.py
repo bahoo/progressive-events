@@ -58,6 +58,8 @@ class Organization(models.Model):
             ('democratic', 'Democratic Party Organization'),
             ('governing-body', 'Governing Body'),
             ('progressive', 'Progressive Organization'),
+            # ('advocacy', 'Advocacy Group'),
+            # ('politician', 'Politician'),
             ('candidate', 'Political Candidate'),
         )
     title = models.CharField(max_length=255)
@@ -103,12 +105,11 @@ class Event(models.Model):
             ('party-event', 'Party Event'),
             ('governing-body-event', 'Governing Body Event'),
             ('volunteer', 'Volunteering Event'),
-            # (None, 'Uncategorized Event'),
-            # todo: flesh this out further.
-            # ('community', 'Community Meetup / Gathering'),
-            # ('advocacy', 'Advocacy'),
-            # ('rally', 'Rally'),
-            # ('forum', 'Forum'),
+            ('advocacy', 'Advocacy'),
+            ('rally', 'Rally'),
+            ('forum', 'Forum'),
+            ('community', 'Community Meetup'),
+            (None, 'Uncategorized Event'),
         )
     title = models.CharField(max_length=255)
     venue = models.ForeignKey(Venue, null=True, blank=True)

@@ -5,6 +5,16 @@
     <style>
         html, body{ margin: 0; padding: 0; height: 100%; }
         #map{ width: 100%; height: 100%; }
+
+        @font-face { font-family: 'Glyphicons Halflings'; src: url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.eot'); src: url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.woff') format('woff'), url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg'); }
+        .glyphicon { position: relative; top: 1px; display: inline-block; font-family: 'Glyphicons Halflings'; font-style: normal; font-weight: normal; line-height: 1; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .glyphicon-map-marker:before { content: "\e062"; }
+        .glyphicon-link:before { content: "\e144"; }
+        .glyphicon-calendar:before { content: "\e109"; }
+        .glyphicon-time:before { content: "\e023"; }
+        .glyphicon-repeat:before { content: "\e030"; }
+        h5{ font-size: 1.25em; margin: 0 0 0.75em; }
+        .leaflet-popup-content p{ margin: 12px 0; }
     </style>
 </head>
 <body>
@@ -31,23 +41,23 @@
 
             var event = events[i];
 
+            var template = `<h5>${event.title}</h5>`;
+            if(event.venue.address){
+                template += `<p><a href="https://www.google.com/maps/place/${encodeURIComponent(event.venue.address)}%2C+${encodeURIComponent(event.venue.city)}%2C+${encodeURIComponent(event.venue.state)}+${event.venue.zipcode}" target="_blank"><span class="glyphicon glyphicon-map-marker" style="margin-right: 0.33em;"></span><b>${event.venue.title}</b><span class="text-muted" style="margin-left: 0.333em;">${event.venue.address}, ${event.venue.city}</span></a></p>`
+            }
+            
+            if(event.description){
+                template += `<p>${event.description}</p>`
+            }
+
+            if(event.url){
+                template += `<p><a href="${event.url}" target="_blank" class="link"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>${event.url}</a></p>`
+            } else {
+                template += `<p><a href="http://www.progressiveevents.org/events/${event.slug}" target="_blank" class="link"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>More info on Progressive Events</a></p>`
+            }
+
             points.push(L.marker([event.venue.point.y, event.venue.point.x])
-                    .bindPopup(`{% spaceless %}
-                                <h5>${event.title}</h5>
-                                {% if event.venue.address %}
-                                    <p>
-                                        <a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank"><span class="glyphicon glyphicon-map-marker" style="margin-right: 0.33em;"></span><b>{{ event.venue.title }}</b><span class="text-muted" style="margin-left: 0.333em;">{{ event.venue.address }}, {{ event.venue.city }}</span></a>
-                                    </p>
-                                {% endif %}
-                                {% if event.description %}
-                                    <p>{{ event.description | linebreaksbr | safe }}</p>
-                                {% endif %}
-                                <p>
-                                    {% if event.url %}
-                                        <a href="{{ event.url }}" target="_blank" class="link"><span class="glyphicon glyphicon-link" style="margin-right: 0.33em;"></span>{{ event.url }}</a><br />
-                                    {% endif %}
-                                    <a href="#{{ event.title | slugify }}-{{ event.pk }}"><span class="glyphicon glyphicon-info-sign" style="margin-right: 0.33em"></span>Jump to listing</a>
-                                </p>{% endspaceless %}`));
+                    .bindPopup(template));
 
         }
 

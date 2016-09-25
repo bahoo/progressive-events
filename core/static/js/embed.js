@@ -126,7 +126,12 @@ var progressive_events_embed = (function(){
             self.distanceField = document.createElement('select');
             self.distanceField.setAttribute('style', 'margin-left: 1em;')
 
-            var distances = [5, 10, 20, 50];                
+            var distances = self.scriptTag.dataset.distances;
+            if(distances){
+                distances = JSON.parse(distances);
+            } else {
+                distances = [5, 10, 20, 50];                
+            }
             var setDistance = self.filters.match(/distance=(\d+)/i);
             if(setDistance){
                 setDistance = parseInt(setDistance[1]);

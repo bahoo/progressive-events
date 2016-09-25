@@ -47,7 +47,7 @@
 
 <h3>Include Live Updating List:</h3>
 <!-- <p>You can find the search params format by doing a search on the home page &mdash; just copy the query string.</p> -->
-<p><code>&lt;script src="{% static "js/embed.js" %}" data-search="true" data-showlist="true" data-filters="address=Denver%2C+CO&amp;days=90&amp;distance=75"&gt;&lt;/script&gt;</code></p>
-<script src="{% static "js/embed.js" %}" data-search="true" data-showlist="true" data-filters="address=Denver%2C+CO&amp;days=90&amp;distance=75"></script>
+<p><code>&lt;script src="{% static "js/embed.js" %}" data-search="true" data-showlist="true" data-distances='[10, 25, 50, 100, 500]' data-filters="address=Denver%2C+CO&amp;days=90&amp;distance=75"&gt;&lt;/script&gt;</code></p>
+<script src="{% static "js/embed.js" %}" data-search="true" data-showlist="true" data-distances='[10, 25, 50, 100, 500]' data-filters="address=Denver%2C+CO&amp;days=90&amp;distance=75"></script>
 
 {% endblock %}

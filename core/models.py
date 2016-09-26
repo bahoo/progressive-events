@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from localflavor.us.models import PhoneNumberField, USStateField, USZipCodeField
 from recurrence.fields import RecurrenceField
 
+from .fields import MoneypatchedRecurrenceField
 from .utils import get_point
 
 
@@ -35,7 +36,15 @@ class Venue(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)[0:255]
+            candidate_slug = slugify(self.title)[0:255]
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
+                candidate_slug_counter = 1
+                while True:
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                        break
+                    candidate_slug_counter += 1
+
+            self.slug = candidate_slug
         if self.address and not self.point:
             if self.zipcode:
                 self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
@@ -52,6 +61,8 @@ class Organization(models.Model):
             ('democratic', 'Democratic Party Organization'),
             ('governing-body', 'Governing Body'),
             ('progressive', 'Progressive Organization'),
+            # ('advocacy', 'Advocacy Group'),
+            # ('politician', 'Politician'),
             ('candidate', 'Political Candidate'),
         )
     title = models.CharField(max_length=255)
@@ -65,7 +76,15 @@ class Organization(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)[0:255]
+            candidate_slug = slugify(self.title)[0:255]
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
+                candidate_slug_counter = 1
+                while True:
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                        break
+                    candidate_slug_counter += 1
+
+            self.slug = candidate_slug
         return super(Organization, self).save(*args, **kwargs)
 
 
@@ -74,11 +93,11 @@ class EventQueryset(models.query.GeoQuerySet):
     def filter_by_date(self, as_occurrences=False, **kwargs):
         future_date = datetime.now() + timedelta(**kwargs)
         queryset = self.all()
-        events = filter(lambda e: len(e.recurrences.between(datetime.now(), future_date)) > 0, queryset)
+        events = filter(lambda e: len(e.recurrences.between(datetime.now(), future_date, inc=True)) > 0, queryset)
         if as_occurrences:
             occurrences = []
             for e in events:
-                occurrences += e.recurrences.between(datetime.now(), future_date)
+                occurrences += e.recurrences.between(datetime.now(), future_date, inc=True)
             return occurrences
         else:
             return self.filter(pk__in=map(lambda e: e.pk, events))
@@ -89,6 +108,11 @@ class Event(models.Model):
             ('party-event', 'Party Event'),
             ('governing-body-event', 'Governing Body Event'),
             ('volunteer', 'Volunteering Event'),
+            ('advocacy', 'Advocacy'),
+            ('rally', 'Rally'),
+            ('forum', 'Forum'),
+            ('community', 'Community Meetup'),
+            (None, 'Uncategorized Event'),
         )
     title = models.CharField(max_length=255)
     venue = models.ForeignKey(Venue, null=True, blank=True)
@@ -96,8 +120,8 @@ class Event(models.Model):
     slug = models.SlugField(blank=True, null=True, max_length=255)
     description = models.TextField(blank=True)
     start = models.TimeField(default=round_hours)
-    end = models.TimeField(default=round_two_hours,null=True)
-    recurrences = RecurrenceField(null=True)
+    end = models.TimeField(default=round_two_hours)
+    recurrences = MoneypatchedRecurrenceField(null=True)
     event_type = models.CharField(max_length=255, choices=EVENT_TYPE_CHOICES, null=True, blank=True)
     host = models.ForeignKey(Organization, blank=True, null=True)
     objects = EventQueryset.as_manager()
@@ -110,14 +134,20 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            super(Event, self).save(*args, **kwargs)
-            self.slug = slugify(self.title + '-' + str(self.id))[0:255]
-            self.save()
-        else:
-            return super(Event, self).save(*args, **kwargs)
+            candidate_slug = slugify(self.title)[0:255]
+            if self.__class__.objects.filter(slug=candidate_slug).exists():
+                candidate_slug_counter = 1
+                while True:
+                    if not self.__class__.objects.filter(slug="%s-%s" % (candidate_slug, candidate_slug_counter)).exists():
+                        break
+                    candidate_slug_counter += 1
+
+            self.slug = candidate_slug
+        return super(Event, self).save(*args, **kwargs)
 
     def dates(self, *args, **kwargs):
         if not kwargs:
-            kwargs = {'days': 45}
-        future_date = datetime.now() + timedelta(**kwargs)
-        return self.recurrences.between(datetime.now(), future_date)
+            kwargs = {'days': 60}
+        today = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+        future_date = today + timedelta(**kwargs)
+        return [i for i in self.recurrences.between(after=today, before=future_date, inc=True)]

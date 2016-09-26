@@ -3,43 +3,17 @@ import urllib
 
 from datetime import datetime, timedelta
 from django.contrib import messages
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.measure import D
-from django.db.models import Q
-from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView, TemplateView, View
+from django.views.generic import DetailView, TemplateView
 
-
-from .forms import SearchForm, VenueForm, OrganizationForm, EventForm
-from .models import Event, Venue
-from .utils import get_point
-
+from .api import EventFilterBackend
+from .forms import VenueForm, OrganizationForm, EventForm
+from .models import Event, Organization, Venue
 
 
 class EventDetailView(DetailView):
     template_name = 'event_detail.html'
     model = Event
-
-
-
-class MiniAPIView(View):
-    search_field = 'title'
-    api_fields = ['id', 'title']
-
-    def get_searches(self, request):
-        if request.GET.get('search'):
-            return {'%s__icontains' % self.search_field: request.GET.get('search')}
-        return {}
-
-    def get(self, request, *args, **kwargs):
-        return JsonResponse(list(self.model.objects.filter(**self.get_searches(request)).values(*self.api_fields)), safe=False)
-
-
-class VenueAPIView(MiniAPIView):
-    model = Venue
-    api_fields = ['id', 'title', 'address', 'city', 'state', 'zipcode']
 
 
 class MapView(TemplateView):
@@ -48,33 +22,25 @@ class MapView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapView, self).get_context_data(**kwargs)
 
-        initial_data = {'address': 'Seattle, WA', 'distance': '15', 'days': '30'}
-
-        for k, v in initial_data.iteritems():
-            if self.request.GET.get(k, None):
-                if k == 'event_types':
-                    initial_data[k] = self.request.GET.getlist(k)
-                else:
-                    initial_data[k] = self.request.GET.get(k)
-
-        search_form = SearchForm(initial_data)
-
-        point = GEOSGeometry('POINT(%(x)s %(y)s)' % get_point(search_form.data['address']), srid=4326)
-
-        event_type_filter = Q()
-        if search_form.data.get('event_types', None):
-            for event_type in search_form.data['event_types']:
-                event_type_filter = event_type_filter | Q(event_type=event_type)
-
-        events = Event.objects.filter(event_type_filter).filter(venue__point__distance_lte=(point, D(mi=float(search_form.data['distance'])))).select_related('venue', 'host').filter_by_date(days=int(search_form.data['days'])).annotate(distance=Distance('venue__point', point)).order_by('distance')
-
-        context['events'] = events
+        event_filter_backend = EventFilterBackend()
+        search_form = event_filter_backend.prepare_search_form(request=self.request)
+        point = event_filter_backend.get_point(search_form.data['address'])
+        context['events'] = event_filter_backend.filter_queryset(request=self.request, queryset=Event.objects.all(), view=self, search_form=search_form, point=point)
+        
         context['now'] = datetime.now()
         context['future'] = datetime.now() + timedelta(days=int(search_form.data['days']))
         context['search_form'] = search_form
         context['point'] = point
 
         return context
+
+
+class EmbedView(TemplateView):
+    template_name = 'embed.html'
+
+
+class EmbedDemoView(TemplateView):
+    template_name = 'embed-demo.html'
 
 
 class AddView(TemplateView):
@@ -87,12 +53,18 @@ class AddView(TemplateView):
 
         if (venue_form.data['venue-venue_id'] or venue_form.is_valid()) and \
                 event_form.is_valid() and \
-                organization_form.is_valid():
-            organization = organization_form.save()
+                (organization_form.data['organization-organization_id'] or organization_form.is_valid()):
+
             if venue_form.data['venue-venue_id']:
                 venue = Venue.objects.get(pk=int(venue_form.data['venue-venue_id']))
             else:
                 venue = venue_form.save()
+
+            if organization_form.data['organization-organization_id']:
+                organization = Organization.objects.get(pk=int(organization_form.data['organization-organization_id']))
+            else:
+                organization = organization_form.save()
+
             event = event_form.save(commit=False)
             event.host = organization
             event.venue = venue

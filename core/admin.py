@@ -24,3 +24,4 @@ class EventAdmin(admin.OSMGeoAdmin):
     prepopulated_fields = {"slug": ("title",)}
     list_display = ['title', 'event_type']
     list_filter = ['event_type']
+    save_as = True

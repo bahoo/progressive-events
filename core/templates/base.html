@@ -18,7 +18,7 @@
         {% block og_meta %}
             <meta property="og:title" content="Progressive Events" />
             <meta property="og:url" content="http://www.progressiveevents.org" />
-            <meta property="og:image" content="http://www.progressiveevents.org{% static "img/pe-og.png" %}" />
+            <meta property="og:image" content="{% static "img/pe-og.png" %}" />
             <meta property="og:description" content="Decisions get made by people who show up. Progressive Events is here to point you to events in your community so you can be part of that process." />
         {% endblock %}
         
@@ -71,7 +71,7 @@
     <div class="container">
         <footer>
             <p>ProgressiveEvents.org is a <a href="http://www.jonculver.com/">Jon Culver</a> production, &copy; 2016&ndash;&infin;.<br />
-                Want to help out? <a href="mailto:jon.c.culver@gmail.com">Get in touch</a> and let's blow this thing up!</p>
+                <a href="{% url "why" %}">Read more about why I made this</a>. Want to help out? <a href="mailto:jon.c.culver@gmail.com">Get in touch</a> and let's blow this thing up!</p>
         </footer>
     </div>
 </section>

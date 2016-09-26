@@ -36,7 +36,7 @@
                         <p><span class="glyphicon glyphicon-link text-muted"></span> More info: <a href="{{ event.url }}" target="_blank" class="link">{{ event.url }}</a></p>
                     {% endif %}
 
-                    {% event_dates event days=30 as dates %}
+                    {% event_dates event days=60 as dates %}
                     <div class="row">
                         <div class="col-sm-4">
                             <h5 class="text-muted xs-inline"><span class="glyphicon glyphicon-calendar"></span>
@@ -74,6 +74,9 @@
                         <li><a href="https://www.google.com/maps/place/{{ event.venue.address|urlencode }}%2C+{{ event.venue.city|urlencode }}%2C+{{ event.venue.state|urlencode }}+{{ event.venue.zipcode|urlencode }}" target="_blank">Get Directions</a></li>
                         <!-- iCal / etc. export -->
                     </ul>
+
+                    <h5>Embed this event:</h5>
+                    <textarea readonly="readonly" class="form-control" rows="5"><script src="http://{{ request.get_host }}{% static "js/embed.js" %}" id="progressive-events-embed" data-filters="event={{ event.slug }}"></script></textarea>
 
                 </div>
             </div>

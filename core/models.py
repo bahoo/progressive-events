@@ -50,6 +50,7 @@ class Venue(models.Model):
                 self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
             else:
                 self.point = Point(**get_point(', '.join([self.address, self.city, self.state])))
+                
         return super(Venue, self).save(*args, **kwargs)
 
     def __unicode__(self):

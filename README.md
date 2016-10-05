@@ -41,4 +41,5 @@ Then set some variables in your `.env` file:
 
 `python manage.py load_bnc` - Grab all BNC data. (Will refactor to allow all NationBuilder events to be taken)
 
-`python manage.py load_coloradocare data/colorado_care.json` - Stores Colorado Care data.
+`python manage.py load_coloradocare data/a69init.json` - Stores Colorado Care data.
+`python manage.py load_coloradocare` - periodic pull of data from ColoradoCare calendar

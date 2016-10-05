@@ -12,58 +12,110 @@ import pprint
 import re
 from django.contrib.gis.geos import Point
 from dateutil import parser
+import requests
+from django.conf import settings
+from django.contrib.gis.geos import GEOSGeometry
+
+from core.utils import get_venue
 
 class Command(BaseCommand):
     
     def add_arguments(self, parser):
-        parser.add_argument('filename', nargs='+', type=str)
+        parser.add_argument('filename', nargs='*', default=False, type=str)
                     
     def handle(self, *args, **options):
-    # now do the things that you want with your models here
-        filename = options['filename'][0]
-        print "%s -- filename" % filename
+        '''
+        handle: If `filename` is specified, this reads through a file set by the user OR
+                this takes in data from the ColoradoCare calendar automatically.
+        '''
+        filename = options['filename'][0] if options['filename'] else None
         
+        # Load Data
         org = self.store_organization()
-        with open(filename, 'rb') as data_file:
-            data = json.loads(data_file.read())
-            counter = 1
+        data = None
+        if filename:
+            with open(filename, 'rb') as data_file:
+                data = json.loads(data_file.read())
+        else:
+            request = requests.get(settings.COLORADO_CARE_URL)
+            data = request.json()
+        
+        for item in data['items']:
             
-            # VCalendar has its own set of event list
-            for item in data['VCALENDAR'][0]['VEVENT']:
-                #Skip recurrences
-                if 'RRULE' in item: 
-                    next
-                    
-                address = item['LOCATION'].split('\\,') 
-                if len(address) <= 1: 
-                    next
-                else:
-                    # Get Venue
-                    (title, add, city, state, zipcode) = self.extract_address(address)
-                    venue = self.store_venue(title, add, city, state, zipcode)
-                    
-                    #Parse datetime
-                    e_start = self.parse_datetime(item)
-                    
-                    self.store_event(venue, org, item['SUMMARY'], '', item['DESCRIPTION'], e_start)
-
-            # Root object also has its own set of event list
-            for item in data['VEVENT']:
-                if 'RRULE' in item: 
-                    next
-                    
-                address = item['LOCATION'].split('\\,')
+            #PARSING
+            url = item['htmlLink']
+            title = item['summary'] if 'summary' in item else ''
+            description = item['description'] if 'description' in item else ''
+            location = item['location'] if 'location' in item else None
                 
-                if len(address) <= 1: 
-                    next
-                else:
-                    (title, add, city, state, zipcode) = self.extract_address(address)
-                    venue = self.store_venue (title, add, city, state, zipcode)
-                    
-                    e_start = self.parse_datetime(item)
-                    
-                    self.store_event(venue, org, item['SUMMARY'], '', item['DESCRIPTION'], e_start)
+            # start date
+            start_tz = None
+            start_dt = None
+            if 'start' in item:
+                if 'dateTime' in item['start']:
+                    start_dt = item['start']['dateTime']
+                elif 'date' in item['start']:
+                    start_dt = item['start']['date']
+                
+                if 'timeZone' in item['start']:
+                    start_tz = item['start']['timeZone']
             
+            # end date
+            end_tz = None
+            end_dt = None
+            if 'end' in item:
+                if 'dateTime' in item['end']:
+                    end_dt = item['end']['dateTime']
+                elif 'date' in item['end']:
+                    end_dt = item['end']['date']
+                
+                if 'timeZone' in item['end']:
+                    end_tz = item['end']['timeZone']
+            
+            
+            # Extract VENUE
+            venue = None
+            if location is None or start_dt is None:
+                next
+            else:
+                venue = self.parse_venue(location)
+                
+            if venue is None: 
+                next
+                
+            # Extract datetime
+            if start_dt is None:
+                next
+            else:
+                e_start = self.parse_datetime(start_dt, start_tz)
+                
+            if end_dt is not None:
+                e_end = self.parse_datetime(end_dt, end_tz)
+            
+            self.store_event(venue, org, title, description, url, e_start, e_start, e_end)
+                
+    def parse_venue(self, raw_venue):
+        geocoded = get_venue(raw_venue)
+        
+        if geocoded is None:
+            return None
+            
+        point = 'POINT (%f %f)' % (geocoded['point']['lat'], geocoded['point']['lng'])
+        address = '%s %s' % (geocoded['street_number'] if 'street_number' in geocoded else '', geocoded['route'] if 'route' in geocoded else '')
+        city = None
+        if 'locality' in geocoded:
+            city = geocoded['locality']
+        elif 'neighborhood' in geocoded:
+            city = geocoded['neighborhood']
+        else:
+            city = None
+        
+        state = geocoded['state']
+        zipcode = geocoded['zipcode'] if 'zipcode' in geocoded else ''
+        
+        venue = self.store_venue(raw_venue, address, city, state, zipcode, point = GEOSGeometry(point))
+        return venue
+                
     def extract_address(self, address):
         title = None
         complete_address = None
@@ -74,12 +126,10 @@ class Command(BaseCommand):
         m = re.match('(\w{2})\s+(\d{5})', state_zip)
         
         if m == None:
-            print(address)
             zipcode = None
             state = None
 
         else:
-        
             zipcode = m.group(2)
             state = m.group(1)
         
@@ -92,48 +142,39 @@ class Command(BaseCommand):
         
         return (title, complete_address, city, state, zipcode)
     
-    def parse_datetime(self, item):
-        e_start = None
+    def parse_datetime(self, date_time, time_zone):
+        '''
+        Grab the date time aspect of the event line, and parse out the time and timezone
+        Afterwhich, convert it to Denver time
+        '''
+        co_time = None
         
-        if 'DTSTART;TZID=America/Los_Angeles' in item:
-            dt = parser.parse(item['DTSTART;TZID=America/Los_Angeles']).replace(tzinfo=pytz.timezone("America/Los_Angeles"))
-            e_start = dt.astimezone(pytz.timezone("America/Denver")).replace(minute=dt.minute)
-        elif 'DTSTART;TZID=America/Denver' in item:
-            e_start = parser.parse(item['DTSTART;TZID=America/Denver'])
-        elif 'DTSTART' in item:
-            dt = parser.parse(item['DTSTART']).replace(tzinfo=pytz.timezone("UTC"))
-            e_start = dt.astimezone(pytz.timezone("America/Denver"))
-        elif 'DTSTART;VALUE=DATE' in item:
-            dt = parser.parse(item['DTSTART;VALUE=DATE']).replace(tzinfo=pytz.timezone("UTC"))
-            e_start = dt.astimezone(pytz.timezone("America/Denver"))
-        else:
-            return None
-            
-        return e_start    
+        dt = parser.parse(date_time).replace(tzinfo=pytz.timezone(time_zone)) if time_zone is not None else parser.parse(date_time)
+        co_time = dt.astimezone(pytz.timezone("America/Denver")).replace(minute=dt.minute) if time_zone is not None else dt
+
+        return co_time
         
-    def store_event(self,venue, org, name, url, description, event_date):
+    def store_event(self,venue, org, name, description, url, event_date, start, end):
         title=name
-        url=''
-        start=event_date.time()
         event_type='volunteer'
         recurrences=recurrence.Recurrence(
             rdates=[event_date]
         )
         
-        result = Event.objects.filter(title=title).filter(start=start)
+        result = Event.objects.filter(url=url)
         if len(result) == 0:
             new_event = Event(
                 title=title, 
                 url=url,
                 description=description,
-                start=event_date,
+                end=end,
+                start=start,
                 recurrences=recurrences,
                 event_type=event_type,
                 host=org,
                 venue=venue
             )
             new_event.save()
-            print "[EVENT] Saving: " + new_event.title
             return new_event
         else:
             return result[0]
@@ -152,12 +193,11 @@ class Command(BaseCommand):
                 organization_type=organization_type
             )
             organization.save()
-            print "[ORGANIZATION] Saving: ", organization.title
             return organization
         else:
             return result[0]
             
-    def store_venue(self, title, address, city, state, zipcode):
+    def store_venue(self, title, address, city, state, zipcode, point = None):
         venue = None
         point = None
                 
@@ -172,10 +212,10 @@ class Command(BaseCommand):
                 city=city, 
                 address=address, 
                 state=state,
-                zipcode=zipcode
+                zipcode=zipcode,
+                point=point
             )
             venue.save()
-            print "[VENUE] Saving: ", venue.title
             return venue
         else:
             return result[0]

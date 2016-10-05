@@ -515,8 +515,9 @@ recurrence.DateFormat.prototype = {
     },
 
     Z: function() {
-        var offset = this.data.getTimezoneOffset();
-        return offset * 60;
+        // var offset = this.data.getTimezoneOffset();
+        // return offset * 60;
+        return 0;
     }
 };
 recurrence.DateFormat.formatchars = RegExp(
@@ -564,10 +565,10 @@ recurrence.serialize = function(rule_or_recurrence) {
         };
         return pad(dt.getUTCFullYear(), 4) +
             pad(dt.getUTCMonth() + 1, 2) +
-            pad(dt.getUTCDate(), 2) + 'T' +
-            pad(dt.getUTCHours(), 2) +
-            pad(dt.getUTCMinutes(), 2) +
-            pad(dt.getUTCSeconds(), 2) + 'Z';
+            pad(dt.getUTCDate(), 2); //+ 'T' +
+            // pad(dt.getUTCHours(), 2) +
+            // pad(dt.getUTCMinutes(), 2) +
+            // pad(dt.getUTCSeconds(), 2); // + 'Z';
     };
 
     var serialize_rule = function(rule) {
@@ -669,21 +670,21 @@ recurrence.deserialize = function(text) {
             var second = 0;
         }
         var dt = new Date();
-        if (text.indexOf('Z') > 0) {
-            dt.setUTCFullYear(year);
-            dt.setUTCMonth(month - 1);
-            dt.setUTCDate(day);
-            dt.setUTCHours(hour);
-            dt.setUTCMinutes(minute);
-            dt.setUTCSeconds(second);
-        } else {
+        // if (text.indexOf('Z') > 0) {
+        //     dt.setUTCFullYear(year);
+        //     dt.setUTCMonth(month - 1);
+        //     dt.setUTCDate(day);
+        //     dt.setUTCHours(hour);
+        //     dt.setUTCMinutes(minute);
+        //     dt.setUTCSeconds(second);
+        // } else {
             dt.setFullYear(year);
             dt.setMonth(month - 1);
             dt.setDate(day);
             dt.setHours(hour);
             dt.setMinutes(minute);
             dt.setSeconds(second);
-        }
+        // }
         return dt;
     };
 

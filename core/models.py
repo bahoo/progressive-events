@@ -46,7 +46,11 @@ class Venue(models.Model):
 
             self.slug = candidate_slug
         if self.address and not self.point:
-            self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
+            if self.zipcode:
+                self.point = Point(**get_point(', '.join([self.address, self.city, self.state, self.zipcode])))
+            else:
+                self.point = Point(**get_point(', '.join([self.address, self.city, self.state])))
+                
         return super(Venue, self).save(*args, **kwargs)
 
     def __unicode__(self):

@@ -31,7 +31,8 @@ DEBUG = bool(os.environ.get('DEBUG', False))
 
 ALLOWED_HOSTS = ['progressiveevents.org', 'www.progressiveevents.org', 'localhost', 'progressiveevents.herokuapp.com']
 
-
+COLORADO_CARE_URL = 'https://clients6.google.com/calendar/v3/calendars/00odpg87lg2o43eki6gi0sktgk@group.calendar.google.com/events?calendarId=00odpg87lg2o43eki6gi0sktgk%40group.calendar.google.com&singleEvents=true&timeZone=America%2FDenver&maxAttendees=1&maxResults=250&sanitizeHtml=true&timeMin=2016-08-28T00%3A00%3A00-06%3A00&timeMax=2016-10-02T00%3A00%3A00-06%3A00&key=AIzaSyBNlYH01_9Hc5S1J9vuFmu2nUqBZJNAXxs'
+MANHATTAN_DEMOCRATS_URL = 'https://clients6.google.com/calendar/v3/calendars/manhattandems@gmail.com/events?calendarId=manhattandems%40gmail.com&singleEvents=true&timeZone=America%2FNew_York&maxAttendees=1&maxResults=250&sanitizeHtml=true&timeMin=2016-09-25T00%3A00%3A00-04%3A00&timeMax=2016-12-31T00%3A00%3A00-04%3A00&key=AIzaSyBNlYH01_9Hc5S1J9vuFmu2nUqBZJNAXxs'
 # Application definition
 
 INSTALLED_APPS = [

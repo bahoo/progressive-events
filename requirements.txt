@@ -10,6 +10,7 @@ Django==1.9.6
 django-annoying==0.9.0
 django-bootstrap3==7.0.1
 django-cors-headers==1.1.0
+-e git://github.com/jazzband/django-debug-toolbar@637b0b73bc684f6ea600dca5ca1bb1f090fcee93#egg=django_debug_toolbar-master
 django-dotenv==1.4.1
 django-dynamic-scraper==0.11.0
 django-eventtools==0.9.7
@@ -54,6 +55,7 @@ scrapy-djangoitem==1.1.1
 service-identity==16.0.0
 simplegeneric==0.8.1
 six==1.10.0
+sqlparse==0.2.1
 traitlets==4.2.1
 Twisted==16.2.0
 w3lib==1.14.2

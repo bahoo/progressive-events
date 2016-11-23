@@ -19,10 +19,13 @@ Decisions get made by people who show up. Progressive Events is here to tell you
 
 Things you'll need:
    
+
 1. Postgres database: https://wiki.postgresql.org/wiki/Detailed_installation_guides#MacOS
-2. A unique, secure Django `SECRET_KEY` http://www.miniwebtool.com/django-secret-key-generator/
-3. A Google Maps API key (server side, for geocoding) https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true
-4. Optionally, Redis: http://jasdeep.ca/2012/05/installing-redis-on-mac-os-x/
+2. The GDAL library (http://www.gdal.org/), `brew install GDAL`
+3. The Postgres/GIS library, `brew install postgis`
+4. A unique, secure Django `SECRET_KEY` http://www.miniwebtool.com/django-secret-key-generator/
+5. A Google Maps API key (server side, for geocoding) https://console.developers.google.com/flows/enableapi?apiid=maps_backend,geocoding_backend,directions_backend,distance_matrix_backend,elevation_backend&keyType=CLIENT_SIDE&reusekey=true
+6. Optionally, Redis: http://jasdeep.ca/2012/05/installing-redis-on-mac-os-x/
 
 
 ## Configuration

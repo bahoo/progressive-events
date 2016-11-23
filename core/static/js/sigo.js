@@ -87,6 +87,7 @@ var sigo = function(){
 
                 self.lookup = new XMLHttpRequest();
                 self.lookup.open('GET', self.endpoint + '?search=' + encodeURIComponent(self.getElementById(self.input).value));
+                self.lookup.setRequestHeader('Accept', 'application/json');
                 self.lookup.send(null);
                 self.lookup.onreadystatechange = function(){
                     var DONE = 4, OK = 200;
